@@ -1,0 +1,13 @@
+# Autoria de documentos — P09
+
+Decisão D07 de 19/10/2026: conta autora estável, nome/perfil registrados no envio, histórico preservado após alterações de cadastro e exclusão da conta autora bloqueada. Migração explícita 011 adiciona autor_conta_id, autor_nome e autor_perfil nullable, com FK para usuarios RESTRICT. Não altera enviado_por/enviado_por_perfil/autoria_confirmada, data, descrição, nome ou caminho dos registros existentes. Não deriva conta por nome/ID/perfil atual: todos os registros sem referência histórica comprovada continuam com autor_conta_id NULL, pendentes. Nenhuma migração real executada.
+
+Novo upload revalida e trava a conta/pessoa autenticada na mesma transação do documento e grava o snapshot desse momento, ignorando autor fornecido pelo cliente. Administrador tem conta/perfil próprios e não é convertido em aluno. Aluno consulta/baixa apenas envio com autoria confirmada, autor_conta_id igual à conta da sessão e autor_perfil aluno, dentro do projeto autorizado. Professor responsável/admin conservam acesso permitido e distinguem pendências. Remover uma pessoa mantém a conta histórica (sem acesso acadêmico enquanto estiver sem vínculo) e o snapshot; apagar conta autora é vedado pela FK.
+
+GET /documentos/autoria/pendencias, somente administrador, lista IDs/metadados legados para saneamento futuro. Não oferece atribuição automática nem prova de autoria. Exibição usa snapshot e perfil; pendências aparecem como Autoria pendente de identificação, sem nome atual deduzido. Textos escapados e arquivos/datas preservados. Conteúdo público não recebe esses campos.
+
+Validação: 103/103 HTTP/MySQL/arquivos descartáveis e uploads com SQL controlado; 56/56 Chrome controlados. Inclui colisão de pessoa/perfil, autoria da conta real, administrador, migração preservando metadados, bloqueio de exclusão da conta, alteração/exclusão de pessoa, snapshots e XSS. Comandos/resultados em controle08. Sem entidade Atividade ou reclassificação real de legados.
+
+## P37 — texto explicativo independente
+
+Migração explícita 012 adiciona texto_explicativo TEXT NULL. Campo opcional, distinto da descrição VARCHAR(255); legados permanecem NULL. API e navegador validam texto sem controles indevidos e até 65535 bytes UTF-8; limites operacionais do multipart (padrão 8192 bytes por campo, configurável) também se aplicam e podem retornar 413 antes da validação semântica. O texto não é interpretado como HTML. Leitura segue as mesmas permissões dos documentos. Rascunho é preservado em falha; sucesso confirmado limpa descrição/texto/arquivo, e mudança de projeto limpa o formulário. Não cria atividade/subprojeto ou novo vínculo. Testes: 63/63 API/arquivos e 101/101 Chrome em comandos pertinentes, com registros no controle08.

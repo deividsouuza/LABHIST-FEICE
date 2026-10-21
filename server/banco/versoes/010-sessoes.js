@@ -1,0 +1,1 @@
+export default {versao:10,nome:'sessoes-persistentes',passos:[{sql:"CREATE TABLE IF NOT EXISTS sessoes (sid VARCHAR(64) NOT NULL PRIMARY KEY,dados TEXT NOT NULL,conta_id INT NULL,expira_em DATETIME(3) NOT NULL,INDEX labhist_sessoes_expira(expira_em),INDEX labhist_sessoes_conta(conta_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"}]};

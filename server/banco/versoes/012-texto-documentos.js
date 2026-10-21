@@ -1,0 +1,1 @@
+export default {versao:12,nome:'texto-explicativo-documentos',passos:[{tabela:'documentos',coluna:'texto_explicativo',sql:'ALTER TABLE documentos ADD COLUMN texto_explicativo TEXT NULL DEFAULT NULL'}]};

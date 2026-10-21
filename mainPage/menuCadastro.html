@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Labhist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="menu.css">
+</head>
+<body data-sessao="pendente">
+    <div id="sessaoStatus" role="status"><span>Verificando acesso...</span> <button type="button" onclick="inicializarSessao()">Tentar novamente</button></div>
+
+    <!-- Overlay mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">📋</div>
+            <div>
+                <div class="sidebar-logo-text">Sistema Labhist</div>
+                <div class="sidebar-logo-sub">Laboratório de História</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Menu</div>
+
+            <!-- Meus Projetos (somente aluno) -->
+            <button type="button" class="nav-parent" id="navItemMeusProjetos" onclick="showMeusProjetos()" style="display:none;">
+                <div class="nav-parent-icon">📝</div>
+                <span class="nav-parent-label">Meus Projetos</span>
+            </button>
+
+            <button class="nav-parent" id="navQuizzesAluno" type="button" onclick="showCatalogoQuizzes()" style="display:none;"><span class="nav-parent-icon">❓</span><span class="nav-parent-label">Quizzes disponíveis</span></button>
+
+            <button class="nav-parent" id="navResultadosProfessor" type="button" onclick="showResultadosProfessor()" style="display:none;">Resultados acompanhados</button>
+            <button class="nav-parent" id="navHistoricoAluno" type="button" onclick="showHistoricoAluno()" style="display:none;">Meu desempenho</button>
+
+            <!-- Cadastros (item pai) -->
+            <button type="button" class="nav-parent" id="navParent" onclick="toggleCadastros()" aria-expanded="false" aria-controls="navChildren">
+                <div class="nav-parent-icon">🗂️</div>
+                <span class="nav-parent-label">Cadastros</span>
+                <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
+
+            <!-- Sub-items -->
+            <div class="nav-children" id="navChildren">
+                <button type="button" class="nav-child professor" onclick="showForm('professor')" id="childProfessor">
+                    <div class="nav-child-icon">👨‍🏫</div>
+                    <span class="nav-child-label">Professor</span></button>
+                <button type="button" class="nav-child aluno" onclick="showForm('aluno')" id="childAluno">
+                    <div class="nav-child-icon">👨‍🎓</div>
+                    <span class="nav-child-label">Aluno</span></button>
+                <button type="button" class="nav-child projeto" onclick="showForm('projeto')" id="childProjeto">
+                    <div class="nav-child-icon">📝</div>
+                    <span class="nav-child-label">Projeto</span></button>
+                <button type="button" class="nav-child projeto" onclick="showQuizzes()" id="childQuizzes"><div class="nav-child-icon">❓</div><span class="nav-child-label">Quizzes</span></button>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-back" onclick="logout()" style="width:100%; margin-bottom:0.75rem;">Sair</button>
+            <div class="sidebar-footer-text">© 2026 · IFS</div>
+        </div>
+    </aside>
+
+    <!-- ========== MAIN ========== -->
+    <main class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+            <span id="identidadeAtual" aria-live="polite"></span>
+            <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="topbar-breadcrumb">
+                <span class="topbar-breadcrumb-root">Sistema</span>
+                <span class="topbar-breadcrumb-sep">›</span>
+                <span class="topbar-breadcrumb-current" id="breadcrumbCurrent">Início</span>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content" id="mainContent">
+
+            <!-- Welcome -->
+            <div class="welcome-state" id="welcomeState">
+                <div class="welcome-icon">🗂️</div>
+                <div class="welcome-title">Bem-vindo ao App do LabHist</div>
+            </div>
+
+            <!-- List: Meus Projetos (aluno e professor) -->
+            <div class="form-panel" id="listMeusProjetos" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(124,58,237,0.15);">📝</div>
+                    <div>
+                        <div class="panel-head-label">meus</div>
+                        <div class="panel-head-title">Projetos</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body">
+                    <div class="form-section">
+                        <label class="form-label">Sua identidade</label>
+                        <p id="pessoaAtualNome"></p>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body" id="meusProjetosListBody" style="padding-bottom:1.75rem;"></div>
+            </div>
+
+            <!-- Detail: Projeto (aluno e professor) -->
+            <div class="form-panel" id="detalheProjeto" style="display:none; max-width:640px;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(124,58,237,0.15);">📝</div>
+                    <div>
+                        <div class="panel-head-label">projeto</div>
+                        <div class="panel-head-title" id="detalheProjetoNome">—</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+
+                <div class="panel-body" id="detalheProjetoInfo" aria-live="polite"></div>
+                <div class="panel-body"><button class="btn-ghost" id="btnSubprojetosParticipante" onclick="abrirSubprojetosProjeto(projetoAtualDetalheId)" disabled>Ver subprojetos</button></div>
+
+                <div class="panel-body">
+                    <label class="form-label" style="display:block; margin-bottom:0.6rem;" id="detalheDocumentosTitulo">Meus documentos enviados</label>
+                    <div id="detalheDocumentosBody"></div>
+                </div>
+
+                <div class="panel-divider"></div>
+
+                <div class="panel-body" id="docUploadPainel">
+                    <label class="form-label" style="display:block; margin-bottom:0.6rem;">Enviar novo documento</label>
+                    <div class="form-section">
+                        <label class="form-label" for="docUploadDescricao">Descrição</label>
+                        <input class="form-input purple" type="text" placeholder="Ex: Relatório parcial" id="docUploadDescricao" maxlength="255">
+                    </div>
+                    <div class="form-section"><label class="form-label" for="docUploadTexto">Texto explicativo (opcional)</label><textarea class="form-input purple" id="docUploadTexto" rows="4"></textarea></div>
+                    <div class="form-section">
+                        <label class="form-label" for="docUploadArquivo">Arquivo</label>
+                        <input class="form-input purple" type="file" id="docUploadArquivo">
+                        <div class="selected-professors-wrap" id="docUploadArquivo-chip"></div>
+                    </div>
+                </div>
+
+                <div class="panel-foot">
+                    <button class="btn-back" onclick="backToMeusProjetos()">← Voltar</button>
+                    <button class="btn-submit" id="docUploadEnviar" onclick="enviarDocumento()">Enviar documento</button>
+                </div>
+            </div>
+
+            <div class="form-panel" id="listaSubprojetos" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head"><div><div class="panel-head-label">subprojetos de</div><h2 id="subprojetosProjetoNome"></h2></div></div>
+                <div class="panel-body" id="subprojetosAviso" role="status" aria-live="polite"></div>
+                <div class="panel-body" id="subprojetosListBody"></div>
+                <div class="panel-foot"><button class="btn-back" onclick="voltarDoSubprojetoAoProjeto()">← Voltar ao projeto</button><button class="btn-submit" id="btnNovoSubprojeto" onclick="novoSubprojeto()" hidden>+ Cadastrar subprojeto</button></div>
+            </div>
+            <div class="form-panel" id="detalheSubprojeto" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head"><h2 id="subprojetoTitulo"></h2></div>
+                <div class="panel-body" id="subprojetoCampos"></div>
+                <div class="panel-body" id="subprojetoDetalheAviso" role="status" aria-live="polite"></div>
+                <div class="panel-foot"><button class="btn-back" onclick="voltarListaSubprojetos()">← Voltar aos subprojetos</button><button class="btn-submit" id="btnEditarSubprojeto" onclick="editarSubprojeto(subprojetoDetalheAtualId)" hidden>Editar subprojeto</button><button class="btn-ghost" id="btnExcluirSubprojeto" onclick="excluirSubprojeto()" hidden>Excluir subprojeto</button></div>
+            </div>
+
+            <div class="form-panel" id="formSubprojeto" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head"><div><div class="panel-head-label" id="subprojetoFormModo">novo subprojeto em</div><h2 id="subprojetoFormProjeto"></h2></div></div>
+                <div class="panel-body">
+                    <div class="form-section"><label class="form-label" for="sub-titulo">Título</label><input class="form-input purple" id="sub-titulo" type="text" maxlength="255" required></div>
+                    <div class="form-section"><label class="form-label" for="sub-objetivo">Objetivo</label><textarea class="form-input purple" id="sub-objetivo" rows="3"></textarea></div>
+                    <div class="form-section"><label class="form-label" for="sub-descricao">Descrição</label><textarea class="form-input purple" id="sub-descricao" rows="4"></textarea></div>
+                    <div class="form-section"><label class="form-label" for="sub-temas_abordados">Temas abordados</label><textarea class="form-input purple" id="sub-temas_abordados" rows="3"></textarea></div>
+                    <fieldset class="quiz-pergunta" id="subAlunos"><legend>Alunos envolvidos neste subprojeto</legend><p>Selecione os participantes entre os alunos do projeto principal. Um aluno pode participar de mais de um núcleo.</p><div id="subAlunosLista" class="sub-alunos-lista"></div></fieldset>
+                    <p id="subprojetoFormAviso" role="status" aria-live="polite"></p>
+                </div>
+                <div class="panel-foot"><button class="btn-back" onclick="voltarListaSubprojetos()">← Voltar aos subprojetos</button><button class="btn-submit" id="btnSalvarSubprojeto" onclick="submitSubprojeto()">Cadastrar subprojeto</button></div>
+            </div>
+
+            <div class="form-panel" id="catalogoQuizzesAluno" style="display:none;">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2>Quizzes disponíveis</h2></div>
+                <div class="panel-body"><p id="catalogoQuizAviso" role="status" aria-live="polite"></p><div id="catalogoQuizLista"></div></div>
+                <div class="panel-foot"><button type="button" class="btn-ghost" onclick="showCatalogoQuizzes()">Atualizar catálogo</button></div>
+            </div>
+            <div class="form-panel" id="introducaoQuizAluno" style="display:none;">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="alunoQuizTitulo"></h2></div>
+                <div class="panel-body"><p class="texto-projeto" id="alunoQuizIntroducao"></p></div>
+                <div class="panel-foot"><button type="button" class="btn-back" onclick="showCatalogoQuizzes()">Voltar ao catálogo</button><button type="button" class="btn-submit" id="alunoQuizResponder" onclick="abrirAtividadeQuiz()">Abrir quiz</button></div>
+            </div>
+
+            <form class="form-panel" id="atividadeQuizAluno" style="display:none;" novalidate onsubmit="event.preventDefault();enviarRespostasQuiz()">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="atividadeQuizTitulo"></h2></div>
+                <div class="panel-body"><p id="atividadeQuizIntroducao" class="texto-projeto"></p><p>Uma tentativa concluída por quiz. Responda todas as perguntas antes de enviar.</p><div id="atividadeQuizPerguntas"></div><p id="atividadeQuizAviso" role="status" aria-live="polite"></p><section id="atividadeQuizResultado" aria-live="polite"></section></div>
+                <div class="panel-foot"><button type="button" class="btn-back" onclick="showCatalogoQuizzes()">Voltar ao catálogo</button><button type="button" class="btn-ghost" id="atividadeQuizConsultar" onclick="consultarResultadoQuiz()">Consultar resultado salvo</button><button type="submit" class="btn-submit" id="atividadeQuizEnviar">Enviar respostas</button></div>
+            </form>
+
+            <section class="form-panel" id="resultadosProfessor" style="display:none;" aria-labelledby="resultadosProfessorTitulo"><div class="panel-head"><h2 id="resultadosProfessorTitulo">Resultados acompanhados</h2></div><div class="panel-body"><p id="resultadosProfessorAviso" role="status" aria-live="polite"></p><div id="resultadosProfessorLista"></div></div><div class="panel-foot"><button class="btn-ghost" type="button" onclick="showResultadosProfessor()">Atualizar resultados</button></div></section>
+            <section class="form-panel" id="historicoAluno" style="display:none;" aria-labelledby="historicoAlunoTitulo"><div class="panel-head"><h2 id="historicoAlunoTitulo">Meu desempenho</h2></div><div class="panel-body"><p id="historicoAlunoAviso" role="status" aria-live="polite"></p><div id="historicoAlunoLista"></div></div><div class="panel-foot"><button class="btn-ghost" type="button" onclick="showHistoricoAluno()">Atualizar histórico</button></div></section>
+
+            <div class="form-panel" id="listQuizzes" style="display:none;">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2>Quizzes</h2></div>
+                <div class="panel-body" id="quizLista" role="status" aria-live="polite"></div>
+                <div class="panel-foot"><button class="btn-submit" onclick="novoQuiz()">+ Criar quiz</button></div>
+            </div>
+            <div class="form-panel" id="formQuiz" style="display:none;">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="quizFormTitulo">Criar quiz</h2></div>
+                <div class="panel-body" id="quizCampos">
+                    <div class="form-section"><label class="form-label" for="quizTitulo">Título</label><input class="form-input purple" id="quizTitulo" type="text" required maxlength="255"><small id="quizTituloErro" class="quiz-erro"></small></div>
+                    <div class="form-section"><label class="form-label" for="quizDescricao">Descrição</label><textarea class="form-input purple" id="quizDescricao" rows="3"></textarea><small id="quizDescricaoErro" class="quiz-erro"></small></div>
+                    <p>Escolha única: marque uma alternativa correta em cada pergunta.</p>
+                    <div id="quizPerguntas"></div><button type="button" class="btn-ghost" onclick="adicionarPerguntaQuiz()">+ Adicionar pergunta</button>
+                    <p id="quizFormAviso" role="status" aria-live="polite"></p><div id="quizRevisao" class="texto-projeto" aria-live="polite"></div>
+                </div>
+                <div class="panel-foot"><button class="btn-back" onclick="showQuizzes()">← Voltar</button><button class="btn-ghost" onclick="revisarQuiz()">Revisar</button><button class="btn-submit" id="quizSalvar" onclick="submitQuiz()">Cadastrar quiz</button></div>
+            </div>
+
+            <form class="form-panel" id="formQuizDisponibilidade" style="display:none;" onsubmit="event.preventDefault();salvarDisponibilidadeQuiz()">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2>Vínculo e publicação do quiz</h2></div>
+                <div class="panel-body">
+                    <div class="form-section"><label class="form-label" for="quizProjeto">Projeto</label><select class="form-input" id="quizProjeto" onchange="carregarSubprojetosDisponibilidade()"></select></div>
+                    <div class="form-section"><label class="form-label" for="quizSubprojeto">Subprojeto (opcional)</label><select class="form-input" id="quizSubprojeto"></select></div>
+                    <div class="form-section"><label class="form-label" for="quizEstado">Estado</label><select class="form-input" id="quizEstado"><option value="rascunho">Rascunho</option><option value="publicado">Publicado</option><option value="arquivado">Arquivado</option></select></div>
+                    <div class="form-section"><label><input type="checkbox" id="quizPublico"> Permitir que visitantes vejam o título e a introdução quando publicado</label></div>
+                    <p>Alunos vinculados ao projeto acessam os quizzes publicados. Quizzes com histórico têm edição bloqueada.</p>
+                    <p id="quizDisponibilidadeAviso" role="status" aria-live="polite"></p>
+                </div>
+                <div class="panel-foot"><button class="btn-back" type="button" onclick="showQuizzes()">Voltar aos quizzes</button><button class="btn-submit" id="quizDisponibilidadeSalvar" type="submit">Salvar disponibilidade</button></div>
+            </form>
+            <div class="form-panel" id="detalheQuiz" style="display:none;">
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="quizDetalheTitulo"></h2></div>
+                <div class="panel-body texto-projeto" id="quizDetalheCorpo"></div><p id="quizDetalheAviso" role="status" aria-live="polite"></p>
+                <div class="panel-foot"><button class="btn-back" onclick="showQuizzes()">← Voltar aos quizzes</button><button class="btn-ghost" id="quizDisponibilidade" onclick="abrirDisponibilidadeQuiz()">Vínculo e publicação</button><button class="btn-submit" id="quizEditar" onclick="editarQuiz()">Editar quiz</button><button class="btn-ghost" id="quizExcluir" onclick="excluirQuiz()">Excluir quiz</button></div>
+            </div>
+
+            <!-- List: Professor -->
+            <div class="form-panel" id="listProfessor" style="display:none;">
+                <div class="panel-accent-bar blue"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(79,142,247,0.15);">👨‍🏫</div>
+                    <div>
+                        <div class="panel-head-label">listagem de</div>
+                        <div class="panel-head-title">Professores</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="search-bar-wrap">
+                    <div class="search-wrap">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input class="search-input" type="text" id="searchProf" placeholder="Buscar por nome..." oninput="filtrarLista('professor')">
+                    </div>
+                </div>
+                <div class="panel-body" id="profListBody"></div>
+                <div class="panel-foot">
+                    <button class="btn-submit" onclick="showRegisterForm('professor')">+ Cadastrar Professor</button>
+                </div>
+            </div>
+
+            <!-- List: Aluno -->
+            <div class="form-panel" id="listAluno" style="display:none;">
+                <div class="panel-accent-bar green"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(6,214,160,0.15);">👨‍🎓</div>
+                    <div>
+                        <div class="panel-head-label">listagem de</div>
+                        <div class="panel-head-title">Alunos</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="search-bar-wrap">
+                    <div class="search-wrap">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input class="search-input green" type="text" id="searchAluno" placeholder="Buscar por nome..." oninput="filtrarLista('aluno')">
+                    </div>
+                    <div class="curso-chips" id="cursoChips">
+                        <button class="chip green" data-curso="Programação de Jogos Digitais" onclick="toggleCurso(this)">Jogos Digitais</button>
+                        <button class="chip green" data-curso="Energias Renováveis" onclick="toggleCurso(this)">Renováveis</button>
+                        <button class="chip green" data-curso="Eletrotécnica" onclick="toggleCurso(this)">Eletrotécnica</button>
+                        <button class="chip green" data-curso="Edificações" onclick="toggleCurso(this)">Edificações</button>
+                    </div>
+                </div>
+                <div class="panel-body" id="alunoListBody"></div>
+                <div class="panel-foot">
+                    <button class="btn-submit" onclick="showRegisterForm('aluno')">+ Cadastrar Aluno</button>
+                </div>
+            </div>
+
+            <!-- List: Projeto -->
+            <div class="form-panel" id="listProjeto" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(124,58,237,0.15);">📝</div>
+                    <div>
+                        <div class="panel-head-label">listagem de</div>
+                        <div class="panel-head-title">Projetos</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body" id="projetoListBody"></div>
+                <div class="panel-foot">
+                    <button class="btn-submit" onclick="showRegisterForm('projeto')">+ Cadastrar Projeto</button>
+                </div>
+            </div>
+
+            <!-- Form: Professor -->
+            <div class="form-panel" id="formProfessor" style="display:none;">
+                <div class="panel-accent-bar blue"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(79,142,247,0.15);">👨‍🏫</div>
+                    <div>
+                        <div class="panel-head-label">cadastro de</div>
+                        <div class="panel-head-title">Novo Professor</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body">
+                    <fieldset id="prof-acesso" class="form-section" style="border:0;padding:0;">
+                        <legend class="form-label">Acesso ao sistema (opcional)</legend>
+                        <label class="form-label" for="prof-usuario">Usuário</label>
+                        <input class="form-input" id="prof-usuario" maxlength="100" autocomplete="off">
+                        <label class="form-label" for="prof-senha">Senha inicial</label>
+                        <input class="form-input" id="prof-senha" type="password" autocomplete="new-password">
+                    </fieldset>
+                    <div class="form-section">
+                        <label class="form-label" for="prof-nome">Nome Completo</label>
+                        <input class="form-input" type="text" placeholder="Digite o nome" id="prof-nome" maxlength="255" required>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="prof-matricula">Matrícula</label>
+                        <input class="form-input" type="text" placeholder="Digite a matrícula" id="prof-matricula" inputmode="numeric" pattern="[0-9]+" maxlength="100">
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="prof-email">E-mail institucional</label>
+                        <input class="form-input" type="email" placeholder="professor@academico.ifs.edu.br" id="prof-email" maxlength="255">
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="prof-telefone">Telefone</label>
+                        <input class="form-input" type="tel" placeholder="(99) 99999-9999" id="prof-telefone" inputmode="numeric" autocomplete="tel-national" maxlength="50">
+                    </div>
+                </div>
+                <div class="panel-foot">
+                    <button class="btn-back" onclick="backToList('professor')">← Voltar</button>
+                    <button class="btn-ghost" onclick="clearForm('formProfessor')">Limpar</button>
+                    <button class="btn-submit" id="btnSubmitProf" onclick="submitProfessor()">Cadastrar Professor</button>
+                </div>
+            </div>
+
+            <!-- Form: Aluno -->
+            <div class="form-panel" id="formAluno" style="display:none;">
+                <div class="panel-accent-bar green"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(6,214,160,0.15);">👨‍🎓</div>
+                    <div>
+                        <div class="panel-head-label">cadastro de</div>
+                        <div class="panel-head-title">Novo Aluno</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body">
+                    <fieldset id="aluno-acesso" class="form-section" style="border:0;padding:0;">
+                        <legend class="form-label">Acesso ao sistema (opcional)</legend>
+                        <label class="form-label" for="aluno-usuario">Usuário</label>
+                        <input class="form-input" id="aluno-usuario" maxlength="100" autocomplete="off">
+                        <label class="form-label" for="aluno-senha">Senha inicial</label>
+                        <input class="form-input" id="aluno-senha" type="password" autocomplete="new-password">
+                    </fieldset>
+                    <div class="form-section">
+                        <label class="form-label" for="aluno-nome">Nome Completo</label>
+                        <input class="form-input green" type="text" placeholder="Digite o nome completo" id="aluno-nome" maxlength="255" required>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="aluno-matricula">Matrícula</label>
+                        <input class="form-input green" type="text" placeholder="Digite a matrícula" id="aluno-matricula" inputmode="numeric" pattern="[0-9]+" maxlength="100" required>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" id="aluno-curso-label">Curso</label>
+                        <div class="radio-group" id="aluno-curso" role="radiogroup" aria-labelledby="aluno-curso-label" tabindex="-1">
+                            <label class="radio-option green"><input type="radio" name="curso" value="Programação de Jogos Digitais" required> <span class="radio-dot"></span> Integrado em Desenvolvimento de Jogos Digitais</label>
+                            <label class="radio-option green"><input type="radio" name="curso" value="Energias Renováveis"> <span class="radio-dot"></span> Integrado em Energias Renováveis</label>
+                            <label class="radio-option green"><input type="radio" name="curso" value="Edificações"> <span class="radio-dot"></span> Integrado em Edificações</label>
+                            <label class="radio-option green"><input type="radio" name="curso" value="Eletrotécnica"> <span class="radio-dot"></span> Integrado em Eletrotécnica</label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" id="aluno-turma-label">Turma</label>
+                        <div class="radio-row" id="aluno-turma" role="radiogroup" aria-labelledby="aluno-turma-label" tabindex="-1">
+                            <label class="radio-option green"><input type="radio" name="turma" value="1° Ano" required> <span class="radio-dot"></span> 1° Ano</label>
+                            <label class="radio-option green"><input type="radio" name="turma" value="2° Ano"> <span class="radio-dot"></span> 2° Ano</label>
+                            <label class="radio-option green"><input type="radio" name="turma" value="3° Ano"> <span class="radio-dot"></span> 3° Ano</label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="aluno-email">E-mail</label>
+                        <input class="form-input green" type="email" placeholder="aluno@academico.ifs.edu.br" id="aluno-email" maxlength="255" required>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="aluno-telefone">Telefone</label>
+                        <input class="form-input green" type="tel" placeholder="(99) 99999-9999" id="aluno-telefone" inputmode="numeric" autocomplete="tel-national" maxlength="50" required>
+                    </div>
+                </div>
+                <div class="panel-foot">
+                    <button class="btn-back" onclick="backToList('aluno')">← Voltar</button>
+                    <button class="btn-ghost" onclick="clearForm('formAluno')">Limpar</button>
+                    <button class="btn-submit" id="btnSubmitAluno" onclick="submitAluno()">Cadastrar Aluno</button>
+                </div>
+            </div>
+
+            <!-- Form: Projeto -->
+            <div class="form-panel" id="formProjeto" style="display:none;">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head">
+                    <div class="panel-head-icon" style="background:rgba(124,58,237,0.15);">📝</div>
+                    <div>
+                        <div class="panel-head-label">cadastro de</div>
+                        <div class="panel-head-title">Novo Projeto</div>
+                    </div>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-body">
+                    <div class="form-section">
+                        <label class="form-label" for="proj-nome">Nome do Projeto</label>
+                        <input class="form-input purple" type="text" placeholder="Digite o nome do projeto" id="proj-nome">
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="proj-descricao">Descrição</label>
+                        <textarea class="form-input purple" rows="3" placeholder="Descreva brevemente o projeto..." style="resize:vertical; line-height:1.6;" id="proj-descricao"></textarea>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="proj-objetivo">Objetivo Principal</label>
+                        <textarea class="form-input purple" rows="2" placeholder="Qual é o objetivo central do projeto?" style="resize:vertical; line-height:1.6;" id="proj-objetivo"></textarea>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="proj-status">Status do projeto</label>
+                        <select class="form-input purple" id="proj-status">
+                            <option value="">Selecione um status...</option>
+                            <option value="em andamento">Em andamento</option>
+                            <option value="finalizado">Finalizado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="proj-professor">Professor Responsável</label>
+                        <div class="multi-select-row">
+                            <select class="form-input purple" id="proj-professor">
+                                <option value="">Selecione um professor...</option>
+                            </select>
+                            <button type="button" class="btn-add-professor" onclick="addProfessorToProjeto()" title="Adicionar professor">+</button>
+                        </div>
+                        <div class="selected-professors-wrap" id="proj-professores-lista">
+                            <div class="selected-empty">Nenhum professor adicionado ao projeto.</div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <label class="form-label" for="proj-aluno">Alunos do Projeto</label>
+                        <div class="multi-select-row">
+                            <select class="form-input purple" id="proj-aluno">
+                                <option value="">Selecione um aluno...</option>
+                            </select>
+                            <button type="button" class="btn-add-professor" onclick="addAlunoToProjeto()" title="Adicionar aluno">+</button>
+                        </div>
+                        <div class="selected-professors-wrap" id="proj-alunos-lista">
+                            <div class="selected-empty">Nenhum aluno adicionado ao projeto.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-foot">
+                    <button class="btn-back" onclick="backToList('projeto')">← Voltar</button>
+                    <button class="btn-ghost" onclick="clearForm('formProjeto')">Limpar</button>
+                    <button class="btn-submit" id="btnSubmitProjeto" onclick="submitProjeto()">Cadastrar Projeto</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+<script src="../configuracao-publica.js"></script>
+<script src="../assets/api.js"></script>
+<script src="modulos/api.js"></script>
+<script src="modulos/comum.js"></script>
+<script src="modulos/pessoas.js"></script>
+<script src="modulos/navegacao.js"></script>
+<script src="modulos/sessao.js"></script>
+<script src="modulos/projetos.js"></script>
+<script src="modulos/subprojetos.js"></script>
+<script src="modulos/documentos.js"></script>
+<script src="modulos/quizzes.js"></script>
+<script src="modulos/desempenho.js"></script>
+<script src="cadastro.js"></script>
+</html>

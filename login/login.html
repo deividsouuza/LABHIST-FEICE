@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabHist - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="card-login">
+      <img src="../assets/logo.png" alt="LabHist" class="logo">
+      <h1 class="title">LOGIN</h1>
+
+      <label for="perfil-log">Tipo de acesso</label>
+      <select id="perfil-log">
+        <option value="">Selecione seu perfil</option>
+        <option value="professor">Professor</option>
+        <option value="aluno">Aluno</option>
+      </select>
+
+      <input type="text" placeholder="Usuario" id="usuario-log" aria-label="Usuário" autocomplete="username" required>
+      <input type="password" placeholder="Senha" id="senha-log" aria-label="Senha" autocomplete="current-password" required>
+
+      <a href="recuperar.html" class="forgot">Esqueceu sua senha?</a>
+
+      <button class="confirm" id="btn-entrar">Entrar</button>
+
+      <p class="visitante">Gostaria de conhecer-nos? <a href="../publico/index.html">Entrar como visitante</a></p>
+    </div>
+  </div>
+</body>
+<script src="../configuracao-publica.js"></script>
+<script src="../assets/api.js"></script>
+<script src="login.js"></script>
+</html>

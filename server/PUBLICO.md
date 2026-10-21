@@ -1,0 +1,11 @@
+# Área de visitante — P33
+
+Com o Express configurado e iniciado pelo procedimento já existente, abra /login/login.html e clique em Entrar como visitante ou acesse /publico/index.html na mesma origem. A área pública usa a configuração pública de origem de P03, com a origem atual por padrão, e não envia cookies. Abrir a página por um servidor estático separado exige integração de origem a tratar em P03/D12; este prompt não alterou CORS nem a configuração do painel privado.
+
+GET /publico/projetos e GET /publico/projetos/:id não exigem sessão. Contrato explícito: id, titulo, descricao, objetivo e status; descrição/objetivo ausentes viram texto vazio e status legado permanece null, exibido como Não informado. Todos os projetos fazem parte desse catálogo informativo; não há política de publicação adicional ou exposição de entidades de conteúdo/quizzes. São as informações de projeto confirmadas para a área de visitante no P33. Não retorna responsáveis, membros, contatos, documentos, caminhos, datas ou outras colunas, mesmo se o driver retornar extras. SQL seleciona somente as cinco colunas; detalhe usa ID validado e parâmetro SQL.
+
+A página contém início, apresentação neutra do espaço LabHist, lista/detalhe de projetos, retorno à lista, atualização e entrada para login. Estados de carregamento/vazio/ausência/erro são explícitos. Textos do banco entram via textContent e não são interpretados como HTML. Sequência de navegação descarta respostas atrasadas. Cache da API é no-store. Não concede sessão nem permite escrita, upload, download privado ou responder quiz.
+
+Testes: test/publico.test.js (7 HTTP/MySQL reais descartáveis) e test/publico-interface.test.js (7 Chrome com banco controlado). O segundo não é navegador+MySQL E2E nem homologação geral de compatibilidade. Comandos reproduzíveis em TESTES.md e resultados em controle08. Sem migração, alteração de dados reais, conteúdos/editais ou quizzes públicos; D02/D03/D04 preservados.
+
+P34: seção Quizzes carrega somente introduções explicitamente públicas em /publico/quizzes e detalhe, sem perguntas/gabarito ou formulário de respostas. Nenhuma chamada acadêmica usa identidade de visitante; leitura pública usa credentials omit.

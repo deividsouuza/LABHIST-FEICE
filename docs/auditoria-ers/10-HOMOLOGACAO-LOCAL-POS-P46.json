@@ -1,0 +1,523 @@
+[
+  {
+    "tipo": "API",
+    "url": "/projetos",
+    "n": 20,
+    "p95_ms": 20.71780000000217,
+    "max_ms": 25.543500000003405
+  },
+  {
+    "tipo": "API",
+    "url": "/usuarios?perfil=aluno",
+    "n": 20,
+    "p95_ms": 16.097200000000157,
+    "max_ms": 16.33879999999772
+  },
+  {
+    "tipo": "API",
+    "url": "/quizzes",
+    "n": 20,
+    "p95_ms": 16.56210000000283,
+    "max_ms": 16.629100000001927
+  },
+  {
+    "browser": "Chrome",
+    "versao": {
+      "protocolVersion": "1.3",
+      "product": "Chrome/155.0.8059.80",
+      "revision": "@43a195105613ac83c21d3f14de279f4a045c7da0",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+      "jsVersion": "15.5.35.23"
+    }
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 107.61439999999857
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 72.25709999999526
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 74.93950000000041
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 126.39249999999447
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 37.03659999999945
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 103.20919999999751
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 100.33660000000236
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 100.54290000000037
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 32.046800000003714
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 34.89680000000226
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 170.30079999999725
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 42.33030000000144
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 30.38669999999547
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 38.63709999999992
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 109.4262000000017
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 53.17149999999674
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 52.80729999999312
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 21.441099999996368
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 27.140299999999115
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 37.63909999999305
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 28.412100000001374
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 58.89890000000014
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 39.82189999999537
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 220.4835000000021
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 23.65020000000368
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 28.236799999998766
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 32.9832000000024
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 38.29869999999937
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 28.088999999999942
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 35.073199999998906
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 28.89600000000064
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 50.869199999993725
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 26.701600000000326
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 40.76629999999568
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 90.50240000000485
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 32.124900000002526
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 27.076500000002852
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 30.613799999999173
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 100.95820000000094
+  },
+  {
+    "browser": "Chrome",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 47.60149999999703
+  },
+  {
+    "browser": "Edge",
+    "versao": {
+      "protocolVersion": "1.3",
+      "product": "Edg/155.0.4283.62",
+      "revision": "@aa3a7406ba8c53a83536df539f07124d73c899bd",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+      "jsVersion": "15.5.9.7"
+    }
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 53.36059999999998
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 91.00269999999728
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 196.08020000000397
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 45.6958999999988
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 37.01009999999951
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 128.55859999999666
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 57.11670000000595
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 78.79980000000069
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 35.33729999999923
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 22.141199999998207
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 36.65999999999622
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 45.18909999999596
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 35.18790000000445
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 53.98500000000058
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 123.77470000000176
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 47.05159999999887
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 24.23619999999937
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 54.22310000000289
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 24.808100000002014
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 36.3096000000005
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 25.82549999999901
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 37.45390000000043
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 44.89280000000144
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 40.79529999999795
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 21.563999999998487
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 24.00119999999879
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 29.25970000000234
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 33.80819999999949
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 28.771200000002864
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 88.61959999999817
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 26.535399999993388
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 42.91610000000219
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 alunos",
+    "ms": 23.702299999997194
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar pessoa",
+    "ms": 51.48090000000229
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar pessoa",
+    "ms": 27.62510000000475
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "listar100 projetos",
+    "ms": 31.73859999999695
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "editar projeto",
+    "ms": 30.709499999997206
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "salvar projeto",
+    "ms": 49.778400000002875
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "abrir projeto/documentos",
+    "ms": 24.669000000001688
+  },
+  {
+    "browser": "Edge",
+    "tipo": "tela",
+    "nome": "upload1MiB",
+    "ms": 42.6707000000024
+  }
+]

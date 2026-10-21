@@ -1,0 +1,23 @@
+# Configuração e segredos locais
+.env
+.env.*
+!.env.example
+
+# Dependências e dados gerados
+node_modules/
+server/uploads/
+coverage/
+*.log
+*.pid
+backups/
+*.sql.gz
+*.dump
+*.bak
+
+# Artefatos locais de ferramentas e apresentações
+.claude/
+.codex/
+prints_relatorio/
+.DS_Store
+Thumbs.db
+Desktop.ini
