@@ -33,7 +33,7 @@ export function validarQuizPayload(req,res,next){
     }catch(erro){if(erro instanceof ErroHttp)return res.status(erro.status).json({erro:erro.message});next(erro);}
 }
 
-async function inserirPergunta(banco,quizId,p,ordem){
+export async function inserirPergunta(banco,quizId,p,ordem){
     const [r]=await banco.query('INSERT INTO quiz_pergunta (quiz_id,descricao,ordem) VALUES (?,?,?)',[quizId,p.descricao,ordem]);
     await banco.query('INSERT INTO quiz_alternativa (pergunta_id,descricao,correta,ordem) VALUES ?',[p.alternativas.map((a,i)=>[r.insertId,a.descricao,a.correta?1:0,i])]);
     return r.insertId;

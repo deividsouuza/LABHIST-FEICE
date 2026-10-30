@@ -4,6 +4,7 @@ import {randomUUID} from 'node:crypto';
 import {fixtureProjetos} from './helpers/fixture-projetos.js';
 import {contas,senhaFixture,carregarAplicacaoIsolada} from './helpers/aplicacao.js';
 import {executarMigracoes,verificarEsquema} from '../banco/migrador.js';
+import {versaoEsperada} from '../banco/migracoes.js';
 
 describe('Mensagens privadas: HTTP real e MySQL descartável',{concurrency:1},()=>{
     let f,tempo=0;
@@ -28,10 +29,10 @@ describe('Mensagens privadas: HTTP real e MySQL descartável',{concurrency:1},()
     });
     after(async()=>{if(f)await f.fechar();});
     it('migra16→17 preservando pessoas, projetos e checksums anteriores; repetição não altera histórico',async()=>{
-        await f.banco.query('DROP TABLE mensagem');await f.banco.query('DROP TABLE mensagem_conversa');await f.banco.query('DELETE FROM schema_migrations WHERE versao=17');
+        await f.banco.query('DROP TABLE mensagem');await f.banco.query('DROP TABLE mensagem_conversa');await f.banco.query('DELETE FROM schema_migrations WHERE versao>=17');
         const [antes]=await f.banco.query('SELECT * FROM schema_migrations ORDER BY versao'),[projetos]=await f.banco.query('SELECT * FROM projeto ORDER BY id');
-        assert.deepEqual(await executarMigracoes(f.banco),{versao:17,aplicadas:[17]});assert.deepEqual((await f.banco.query('SELECT * FROM schema_migrations WHERE versao<=16 ORDER BY versao'))[0],antes);assert.deepEqual((await f.banco.query('SELECT * FROM projeto ORDER BY id'))[0],projetos);
-        assert.deepEqual(await executarMigracoes(f.banco),{versao:17,aplicadas:[]});assert.deepEqual(await verificarEsquema(f.banco),{versao:17});
+        assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:Array.from({length:versaoEsperada-16},(_,i)=>i+17)});assert.deepEqual((await f.banco.query('SELECT * FROM schema_migrations WHERE versao<=16 ORDER BY versao'))[0],antes);assert.deepEqual((await f.banco.query('SELECT * FROM projeto ORDER BY id'))[0],projetos);
+        assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:[]});assert.deepEqual(await verificarEsquema(f.banco),{versao:versaoEsperada});
     });
     it('contatos são somente do outro perfil com conta e projeto em comum; nomes/IDs mínimos',async()=>{
         const r=await f.request('/mensagens/contatos','professor');assert.equal(r.status,200);assert.deepEqual(r.data.contatos.map(p=>p.pessoa_id),[42,44]);

@@ -1,6 +1,7 @@
 import { quizFkAplicada, verificarDisponibilidade } from './quizzes-esquema.js';
 import alunosSubprojetos from './versoes/016-alunos-subprojetos.js';
 import {verificarMensagens} from './mensagens-esquema.js';
+import quizzesProfessor from './versoes/018-quizzes-professor.js';
 import { tabelas, adicoesLegadas } from './esquema.js';
 import { migracoes, versaoEsperada } from './migracoes.js';
 import { prepararIntegridade, restricaoAplicada, verificarIntegridade, ErroIntegridade } from './integridade-projetos.js';
@@ -79,6 +80,7 @@ export async function verificarEsquema(banco) {
     await verificarResultados(banco);
     await verificarAlunosSubprojetos(banco);
     await verificarMensagens(banco);
+    await verificarAutoriaQuiz(banco);
     return { versao: versaoEsperada };
 }
 
@@ -124,6 +126,7 @@ export async function executarMigracoes(banco, ate = versaoEsperada) {
             if (migracao.versao === 15) await verificarResultados(banco);
             if (migracao.versao === 16) await verificarAlunosSubprojetos(banco);
             if (migracao.versao === 17) await verificarMensagens(banco);
+            if (migracao.versao === 18) await verificarAutoriaQuiz(banco);
             await banco.query('INSERT INTO schema_migrations (versao, nome, checksum) VALUES (?, ?, ?)', [migracao.versao, migracao.nome, migracao.checksum]);
             aplicadas.push(migracao.versao);
         }
@@ -136,6 +139,12 @@ export async function executarMigracoes(banco, ate = versaoEsperada) {
 
 async function verificarSubprojetos(banco) {
     if(!await restricaoAplicada(banco,{tipo:'fk',tabela:'subprojeto',coluna:'projeto_id',referencia:'projeto'}))falhar('FK de subprojeto ausente.');
+}
+
+async function verificarAutoriaQuiz(banco){
+    for(const p of quizzesProfessor.passos.filter(p=>p.quizFk))if(!await quizFkAplicada(banco,p))falhar('FK de autoria de quiz ausente.');
+    const [rows]=await banco.query(`SELECT c.CHECK_CLAUSE AS regra,t.ENFORCED AS enforced FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA=c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME=c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA=DATABASE() AND t.TABLE_NAME='quiz' AND t.CONSTRAINT_NAME='labhist_quiz_autoria'`);
+    if(rows.length!==1||rows[0].enforced!=='YES'||rows[0].regra.toLowerCase().replace(/[\s\x60()]/g,'')!=='autor_conta_idisnullandautor_professor_idisnullorautor_conta_idisnotnullandautor_professor_idisnotnull')falhar('Regra de autoria de quiz ausente ou incompatível.');
 }
 
 async function verificarAlunosSubprojetos(banco){

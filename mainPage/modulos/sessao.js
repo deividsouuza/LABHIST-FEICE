@@ -41,9 +41,10 @@ function aplicarPermissoes() {
     if(['professor','aluno'].includes(perfil))iniciarResumoMensagens();else limparMensagens();
     document.getElementById('btnNovoProjetoProfessor').hidden=perfil!=='professor';
     document.getElementById("navResultadosProfessor").style.display=perfil==='professor'?'':'none';
+    document.getElementById('navQuizzesProfessor').style.display=perfil==='professor'?'':'none';
     document.getElementById('navHistoricoAluno').style.display=perfil==='aluno'?'':'none';
     document.getElementById('navQuizzesAluno').style.display=perfil==='aluno'?'':'none';
-    if(perfil!=='administrador')limparDadosQuizzes();
+    if(!['administrador','professor'].includes(perfil))limparDadosQuizzes();
     document.getElementById('navParent').style.display = perfil === 'administrador' ? '' : 'none';
     document.getElementById('navChildren').style.display = perfil === 'administrador' ? '' : 'none';
     document.getElementById('navItemMeusProjetos').style.display = ['aluno','professor'].includes(perfil) ? '' : 'none';

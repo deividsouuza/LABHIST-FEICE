@@ -15,6 +15,8 @@ function hideAll() {
     catalogoQuizSequencia++;catalogoQuizId=null;
     for(const id of ['catalogoQuizzesAluno','introducaoQuizAluno'])document.getElementById(id).style.display='none';
     quizSequencia++;quizEditandoId=null;quizDetalheId=null;quizDisponibilidadeId=null;quizSubprojetoSequencia++;
+    limparCadastroQuizProfessor();
+    document.getElementById('navQuizzesProfessor').classList.remove('open');
     document.getElementById('childQuizzes').classList.remove('active');
     for(const id of ['listQuizzes','formQuiz','detalheQuiz','formQuizDisponibilidade'])document.getElementById(id).style.display='none';
     detalheProjetoSequencia++;

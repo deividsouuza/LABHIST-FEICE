@@ -8,7 +8,7 @@ export const tabelas = {
     contatos_recuperacao:{usuario_id:'INT NOT NULL PRIMARY KEY',email:'VARCHAR(255) NOT NULL',confirmado_por:'INT NOT NULL',confirmado_em:'DATETIME NOT NULL'},
     recuperacao_senha:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',usuario_id:'INT NOT NULL',token_hash:'VARCHAR(64) NOT NULL UNIQUE',versao_sessao:'INT NOT NULL',expira_em:'DATETIME NOT NULL',consumido_em:'DATETIME NULL'},
     sessoes:{sid:'VARCHAR(64) NOT NULL PRIMARY KEY',dados:'TEXT NOT NULL',conta_id:'INT NULL',expira_em:'DATETIME NOT NULL'},
-    quiz:{projeto_id:'INT NULL DEFAULT NULL',subprojeto_id:'INT NULL DEFAULT NULL',estado:"VARCHAR(20) NOT NULL DEFAULT 'rascunho'",introducao_publica:'INT NOT NULL DEFAULT 0',id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',titulo:'VARCHAR(255) NOT NULL',descricao:'TEXT NULL'},
+    quiz:{autor_conta_id:'INT NULL DEFAULT NULL',autor_professor_id:'INT NULL DEFAULT NULL',projeto_id:'INT NULL DEFAULT NULL',subprojeto_id:'INT NULL DEFAULT NULL',estado:"VARCHAR(20) NOT NULL DEFAULT 'rascunho'",introducao_publica:'INT NOT NULL DEFAULT 0',id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',titulo:'VARCHAR(255) NOT NULL',descricao:'TEXT NULL'},
     quiz_pergunta:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',quiz_id:'INT NOT NULL',descricao:'TEXT NOT NULL',ordem:'INT NOT NULL'},
     quiz_alternativa:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',pergunta_id:'INT NOT NULL',descricao:'TEXT NOT NULL',correta:'INT NOT NULL',ordem:'INT NOT NULL'},
     subprojeto:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',projeto_id:'INT NOT NULL',titulo:'VARCHAR(255) NOT NULL',
@@ -60,6 +60,7 @@ export const tabelas = {
 };
 
 export const adicoesLegadas = [
+    ['quiz','autor_conta_id'],['quiz','autor_professor_id'],
     ['quiz','projeto_id'],['quiz','subprojeto_id'],['quiz','estado'],['quiz','introducao_publica'],
     ['usuarios','sessao_versao'],
     ['documentos','texto_explicativo'],

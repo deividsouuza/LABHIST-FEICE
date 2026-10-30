@@ -36,6 +36,7 @@
             <button class="nav-parent" id="navQuizzesAluno" type="button" onclick="showCatalogoQuizzes()" style="display:none;"><span class="nav-parent-icon">❓</span><span class="nav-parent-label">Quizzes disponíveis</span></button>
 
             <button class="nav-parent" id="navResultadosProfessor" type="button" onclick="showResultadosProfessor()" style="display:none;">Resultados acompanhados</button>
+            <button class="nav-parent" id="navQuizzesProfessor" type="button" onclick="showQuizzes()" style="display:none;">Meus quizzes</button>
             <button class="nav-parent" id="navHistoricoAluno" type="button" onclick="showHistoricoAluno()" style="display:none;">Meu desempenho</button>
             <button class="nav-parent" id="navMensagens" type="button" onclick="showMensagens()" style="display:none;"><span class="nav-parent-icon" aria-hidden="true">✉</span><span class="nav-parent-label">Mensagens</span><span id="mensagensContador" class="mensagens-contador" hidden>0</span></button>
 
@@ -236,13 +237,19 @@
             <section class="form-panel" id="historicoAluno" style="display:none;" aria-labelledby="historicoAlunoTitulo"><div class="panel-head"><h2 id="historicoAlunoTitulo">Meu desempenho</h2></div><div class="panel-body"><p id="historicoAlunoAviso" role="status" aria-live="polite"></p><div id="historicoAlunoLista"></div></div><div class="panel-foot"><button class="btn-ghost" type="button" onclick="showHistoricoAluno()">Atualizar histórico</button></div></section>
 
             <div class="form-panel" id="listQuizzes" style="display:none;">
-                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2>Quizzes</h2></div>
+                <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="quizListaTitulo">Quizzes</h2></div>
                 <div class="panel-body" id="quizLista" role="status" aria-live="polite"></div>
                 <div class="panel-foot"><button class="btn-submit" onclick="novoQuiz()">+ Criar quiz</button></div>
             </div>
             <div class="form-panel" id="formQuiz" style="display:none;">
                 <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="quizFormTitulo">Criar quiz</h2></div>
                 <div class="panel-body" id="quizCampos">
+                    <fieldset id="quizVinculoProfessor" class="sub-alunos" hidden>
+                        <legend>Projeto do quiz</legend>
+                        <div class="form-section"><label class="form-label" for="quizCadastroProjeto">Projeto</label><select class="form-input purple" id="quizCadastroProjeto" onchange="carregarSubprojetosCadastroQuiz()"></select></div>
+                        <div class="form-section"><label class="form-label" for="quizCadastroSubprojeto">Subprojeto (opcional)</label><select class="form-input purple" id="quizCadastroSubprojeto"></select></div>
+                        <p>O quiz será salvo como rascunho. A publicação é feita pelo administrador.</p><p id="quizCadastroAviso" role="status"></p>
+                    </fieldset>
                     <div class="form-section"><label class="form-label" for="quizTitulo">Título</label><input class="form-input purple" id="quizTitulo" type="text" required maxlength="255"><small id="quizTituloErro" class="quiz-erro"></small></div>
                     <div class="form-section"><label class="form-label" for="quizDescricao">Descrição</label><textarea class="form-input purple" id="quizDescricao" rows="3"></textarea><small id="quizDescricaoErro" class="quiz-erro"></small></div>
                     <p>Escolha única: marque uma alternativa correta em cada pergunta.</p>

@@ -42,7 +42,7 @@ describe('P28: quiz administrativo no Chrome com API controlada',{skip:!chromePa
     for(const status of [400,403,500])it(`POST${status} preserva toda composicao e reabilita campos`,async()=>{
         await nav.evaluate(preencher);modo={url:'/quizzes',method:'POST',status};const antes=await nav.evaluate('JSON.stringify(capturarQuiz())');await nav.evaluate('submitQuiz()');assert.equal(await nav.evaluate('JSON.stringify(capturarQuiz())'),antes);assert.equal(await nav.evaluate("document.getElementById('quizSalvar').disabled"),false);assert.equal(await nav.evaluate("document.getElementById('quizTitulo').disabled"),false);assert.equal(quizzes.size,0);
     });
-    for(const perfil of ['aluno','professor'])it(`${perfil} nao abre formulario nem consulta gabarito por chamada direta`,async()=>{
+    for(const perfil of ['aluno'])it(`${perfil} nao abre formulario nem consulta gabarito por chamada direta`,async()=>{
         await carregar(perfil);pedidos.length=0;await nav.evaluate('showQuizzes();novoQuiz();abrirQuiz(1);submitQuiz()');assert.equal(pedidos.length,0);assert.equal(await nav.evaluate("document.getElementById('formQuiz').style.display"),'none');assert.equal(await nav.evaluate("getComputedStyle(document.getElementById('navChildren')).display"),'none');
     });
     it('remover/recompor alternativas mantem escolha unica e revisao atualizada',async()=>{

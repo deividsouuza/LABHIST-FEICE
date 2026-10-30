@@ -22,6 +22,7 @@ import * as quizzes from '../../quizzes.js';
 import * as operacao from '../../operacao.js';
 import * as recuperacao from '../../recuperacao.js';
 import * as mensagens from '../../mensagens.js';
+import * as quizzesProfessor from '../../quizzes-professor.js';
 import { pipeline } from 'node:stream/promises';
 import { executarTransacao, transacaoIncerta } from '../../banco/transacao.js';
 import { diagnosticoBanco } from '../../banco/migrador.js';
@@ -103,6 +104,7 @@ export async function carregarAplicacaoIsolada(opcoes = {}) {
         './identidades.js': identidades,
         './acesso-academico.js': acessoAcademico,
         './mensagens.js':{registrarMensagens:(app,args)=>mensagens.registrarMensagens(app,{...args,agora:opcoes.recuperacaoAgora||Date.now})},
+        './quizzes-professor.js':quizzesProfessor,
         './subprojetos.js':subprojetos,
         './quizzes.js':quizzes,
         './upload-documentos.js': {...uploadDocumentos,limitesUpload:()=>uploadDocumentos.limitesUpload(opcoes.uploadEnv||{})},

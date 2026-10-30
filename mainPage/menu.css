@@ -988,3 +988,4 @@ button.nav-parent,button.nav-child{width:100%;border:0;background:transparent;co
 
 .sub-alunos-lista{max-height:20rem;overflow-y:auto;overflow-wrap:anywhere}
 #proj-professor-escolha[hidden],#btnNovoProjetoProfessor[hidden]{display:none}
+#quizVinculoProfessor[hidden],#quizDisponibilidade[hidden],#quizEditar[hidden],#quizExcluir[hidden]{display:none}

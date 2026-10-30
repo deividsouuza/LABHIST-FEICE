@@ -21,6 +21,7 @@ import { registrarQuizzes } from './quizzes.js';
 import { registrarRecuperacao } from './recuperacao.js';
 import { criarTransporte } from './email-recuperacao.js';
 import { registrarMensagens } from './mensagens.js';
+import { registrarQuizzesProfessor } from './quizzes-professor.js';
 
 const configuracao = carregarConfiguracao();
 
@@ -68,6 +69,7 @@ documentos.registrar(app);
 
 registrarSubprojetos(app,{obterPool:()=>pool,requireAuth,requireAdmin,requireIdentidadeAtual,validarIdRota,responderErro});
 registrarQuizzes(app,{obterPool:()=>pool,requireAuth,requireAdmin,validarIdRota,responderErro});
+registrarQuizzesProfessor(app,{obterPool:()=>pool,requireAuth,requireIdentidadeAtual});
 
 registrarDisponibilidadeQuizzes(app,{obterPool:()=>pool,requireAuth,requireAdmin,validarIdRota,responderErro});
 

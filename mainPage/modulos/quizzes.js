@@ -3,6 +3,38 @@ let quizAlunoAtivo=null,quizAlunoEnviando=false;
 let catalogoQuizSequencia=0,catalogoQuizId=null;
 let quizDisponibilidadeId=null,quizDisponibilidadeEnviando=false,quizSubprojetoSequencia=0,quizSubprojetoCarregando=false,quizDisponibilidadePronta=false;
 let quizSequencia=0,quizEnviando=false,quizPerguntaChave=0,quizEditandoId=null,quizDetalheId=null,quizExcluindo=false;
+let quizCadastroSequencia=0,quizCadastroPronto=false;
+function podeCadastrarQuiz(){return ['administrador','professor'].includes(perfilAtual());}
+function apiGestaoQuizzes(){return API+(perfilAtual()==='professor'?'/professor/quizzes':'/quizzes');}
+function marcarNavegacaoQuizzes(){document.getElementById(perfilAtual()==='professor'?'navQuizzesProfessor':'childQuizzes').classList.add(perfilAtual()==='professor'?'open':'active');}
+function limparCadastroQuizProfessor(){
+    quizCadastroSequencia++;quizCadastroPronto=false;
+    for(const id of ['quizCadastroProjeto','quizCadastroSubprojeto'])document.getElementById(id).replaceChildren();
+    document.getElementById('quizCadastroAviso').textContent='';document.getElementById('quizVinculoProfessor').hidden=true;
+}
+async function carregarProjetosCadastroQuiz(){
+    const seq=quizSequencia,conta=sessaoAtual.conta_id,aviso=document.getElementById('quizCadastroAviso');aviso.textContent='Carregando seus projetos...';
+    try{
+        const projetos=validarLista((await apiFetch(API+'/projetos')).dados,'projeto');
+        if(seq!==quizSequencia||perfilAtual()!=='professor'||sessaoAtual?.conta_id!==conta)return;
+        const select=document.getElementById('quizCadastroProjeto');select.replaceChildren();opcaoDisponibilidade(select,'','Selecione um projeto...');
+        for(const p of projetos)opcaoDisponibilidade(select,String(p.id),p.nome);
+        aviso.textContent=projetos.length?'Selecione o projeto para cadastrar o quiz.':'Você precisa participar de um projeto para cadastrar quizzes.';
+    }catch(erro){if(seq===quizSequencia&&!erro.sessaoExpirada)aviso.textContent='Não foi possível carregar os projetos. Volte e abra o cadastro novamente.';}
+}
+async function carregarSubprojetosCadastroQuiz(){
+    if(perfilAtual()!=='professor')return;
+    const seq=++quizCadastroSequencia,geracao=quizSequencia,pai=document.getElementById('quizCadastroProjeto').value,select=document.getElementById('quizCadastroSubprojeto'),aviso=document.getElementById('quizCadastroAviso');
+    quizCadastroPronto=false;document.getElementById('quizSalvar').disabled=true;select.disabled=true;select.replaceChildren();opcaoDisponibilidade(select,'','Sem subprojeto');
+    if(!pai){aviso.textContent='Selecione um projeto.';return;}aviso.textContent='Carregando subprojetos...';
+    try{
+        const lista=(await apiFetch(API+'/projetos/'+pai+'/subprojetos')).dados;
+        if(!Array.isArray(lista)||lista.some(s=>!Number.isInteger(s.id)||s.id<=0||s.projeto_id!==Number(pai)||typeof s.titulo!=='string'))formatoInvalido();
+        if(seq!==quizCadastroSequencia||geracao!==quizSequencia||perfilAtual()!=='professor')return;
+        for(const s of lista)opcaoDisponibilidade(select,String(s.id),s.titulo);
+        quizCadastroPronto=true;select.disabled=false;document.getElementById('quizSalvar').disabled=false;aviso.textContent='';
+    }catch(erro){if(seq===quizCadastroSequencia&&geracao===quizSequencia&&!erro.sessaoExpirada)aviso.textContent='Não foi possível carregar os subprojetos. Selecione o projeto novamente.';}
+}
 
 function elementoQuiz(tag,classe='',texto=''){
     const el=document.createElement(tag);el.className=classe;el.textContent=texto;return el;
@@ -11,7 +43,7 @@ function renumerarPerguntasQuiz(){
     Array.from(document.getElementById('quizPerguntas').children).forEach((p,i)=>p.querySelector('legend').textContent='Pergunta '+(i+1));
 }
 function adicionarAlternativaQuiz(bloco,chave){
-    if(perfilAtual()!=='administrador'||quizEnviando)return;
+    if(!podeCadastrarQuiz()||quizEnviando)return;
     const lista=bloco.querySelector('.quiz-alternativas');if(lista.children.length>=20){bloco.querySelector('.quiz-pergunta-erro').textContent='Limite de 20 alternativas por pergunta.';return;}
     const linha=elementoQuiz('div','quiz-alternativa'),rotulo=elementoQuiz('label','','Correta'),radio=document.createElement('input');
     radio.type='radio';radio.name='quiz-correta-'+chave;radio.className='quiz-correta';rotulo.prepend(radio);
@@ -20,7 +52,7 @@ function adicionarAlternativaQuiz(bloco,chave){
     const erro=elementoQuiz('small','quiz-erro quiz-alternativa-erro');linha.append(rotulo,texto,remover,erro);lista.appendChild(linha);return linha;
 }
 function adicionarPerguntaQuiz(){
-    if(perfilAtual()!=='administrador'||quizEnviando)return;
+    if(!podeCadastrarQuiz()||quizEnviando)return;
     const lista=document.getElementById('quizPerguntas');if(lista.children.length>=50){document.getElementById('quizFormAviso').textContent='Limite de 50 perguntas.';return;}
     const chave=++quizPerguntaChave,bloco=elementoQuiz('fieldset','quiz-pergunta'),legenda=elementoQuiz('legend'),rotulo=elementoQuiz('label','form-label','Texto da pergunta');
     const texto=elementoQuiz('textarea','form-input quiz-pergunta-texto');texto.id='quiz-pergunta-'+chave;texto.rows=3;rotulo.htmlFor=texto.id;
@@ -31,10 +63,12 @@ function adicionarPerguntaQuiz(){
     bloco.addEventListener('input',()=>document.getElementById('quizRevisao').replaceChildren());return bloco;
 }
 function novoQuiz(){
-    if(perfilAtual()!=='administrador'||quizEnviando)return;
+    if(!podeCadastrarQuiz()||quizEnviando)return;
     hideAll();document.getElementById('quizFormTitulo').textContent='Criar quiz';document.getElementById('quizSalvar').textContent='Cadastrar quiz';for(const id of ['quizTitulo','quizDescricao'])document.getElementById(id).value='';
     for(const id of ['quizPerguntas','quizRevisao','quizFormAviso','quizTituloErro','quizDescricaoErro'])document.getElementById(id).replaceChildren();
-    document.getElementById('formQuiz').style.display='block';document.getElementById('childQuizzes').classList.add('active');document.getElementById('breadcrumbCurrent').textContent='Criar quiz';adicionarPerguntaQuiz();
+    document.getElementById('formQuiz').style.display='block';marcarNavegacaoQuizzes();document.getElementById('breadcrumbCurrent').textContent='Criar quiz';adicionarPerguntaQuiz();
+    document.getElementById('quizSalvar').disabled=perfilAtual()==='professor';
+    if(perfilAtual()==='professor'){document.getElementById('quizVinculoProfessor').hidden=false;carregarProjetosCadastroQuiz();}
 }
 function capturarQuiz(){
     let valido=true;
@@ -62,7 +96,7 @@ function renderEstruturaQuiz(container,dados){
     });
 }
 function revisarQuiz(){
-    if(perfilAtual()!=='administrador')return;
+    if(!podeCadastrarQuiz())return;
     const dados=capturarQuiz();if(dados)renderEstruturaQuiz(document.getElementById('quizRevisao'),dados);
 }
 function validarQuizResposta(q){
@@ -75,21 +109,23 @@ function validarQuizResposta(q){
     }return q;
 }
 async function showQuizzes(){
-    if(perfilAtual()!=='administrador')return;
-    hideAll();const seq=quizSequencia,lista=document.getElementById('quizLista');document.getElementById('listQuizzes').style.display='block';document.getElementById('childQuizzes').classList.add('active');document.getElementById('breadcrumbCurrent').textContent='Quizzes';lista.textContent='Carregando...';
+    if(!podeCadastrarQuiz())return;
+    hideAll();const seq=quizSequencia,lista=document.getElementById('quizLista');document.getElementById('listQuizzes').style.display='block';document.getElementById('breadcrumbCurrent').textContent=perfilAtual()==='professor'?'Meus quizzes':'Quizzes';lista.textContent='Carregando...';
     if(window.innerWidth<=768)closeSidebar();
+    marcarNavegacaoQuizzes();document.getElementById('quizListaTitulo').textContent=perfilAtual()==='professor'?'Meus quizzes':'Quizzes';
     try{
-        const dados=(await apiFetch(`${API}/quizzes`)).dados;
+        const dados=(await apiFetch(apiGestaoQuizzes())).dados;
         if(!Array.isArray(dados)||dados.some(q=>!q||!Number.isInteger(q.id)||q.id<=0||typeof q.titulo!=='string'))formatoInvalido();if(seq!==quizSequencia)return;
         lista.replaceChildren();if(!dados.length)lista.textContent='Nenhum quiz cadastrado.';
         for(const q of dados){const botao=elementoQuiz('button','list-item subprojeto-item',q.titulo);botao.type='button';botao.onclick=()=>abrirQuiz(q.id);lista.appendChild(botao);}
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;lista.textContent='Não foi possível carregar os quizzes.';mostrarErro(erro);}
 }
 async function abrirQuiz(id){
-    if(perfilAtual()!=='administrador'||!Number.isInteger(id)||id<=0)return;
+    if(!podeCadastrarQuiz()||!Number.isInteger(id)||id<=0)return;
     const seq=++quizSequencia;
-    try{const q=validarQuizResposta((await apiFetch(`${API}/quizzes/${id}`)).dados);if(q.id!==id)formatoInvalido();if(seq!==quizSequencia)return;
-        hideAll();quizDetalheId=id;document.getElementById('quizDetalheAviso').textContent='';document.getElementById('detalheQuiz').style.display='block';document.getElementById('childQuizzes').classList.add('active');document.getElementById('quizDetalheTitulo').textContent=q.titulo;document.getElementById('breadcrumbCurrent').textContent=q.titulo;renderEstruturaQuiz(document.getElementById('quizDetalheCorpo'),q);return true;
+    try{const q=validarQuizResposta((await apiFetch(apiGestaoQuizzes()+'/'+id)).dados);if(q.id!==id)formatoInvalido();if(seq!==quizSequencia)return;
+        hideAll();quizDetalheId=id;document.getElementById('quizDetalheAviso').textContent=perfilAtual()==='professor'?'Estado: '+q.estado+'. A publicação e as alterações são feitas pelo administrador.':'';document.getElementById('detalheQuiz').style.display='block';marcarNavegacaoQuizzes();document.getElementById('quizDetalheTitulo').textContent=q.titulo;document.getElementById('breadcrumbCurrent').textContent=q.titulo;renderEstruturaQuiz(document.getElementById('quizDetalheCorpo'),q);
+        for(const id of ['quizDisponibilidade','quizEditar','quizExcluir'])document.getElementById(id).hidden=perfilAtual()!=='administrador';return true;
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;mostrarErro(erro);}
 }
 async function excluirQuiz(id=quizDetalheId){
@@ -119,12 +155,17 @@ async function editarQuiz(id=quizDetalheId){
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;mostrarErro(erro);}
 }
 async function submitQuiz(){
-    if(perfilAtual()!=='administrador'||quizEnviando)return;
+    if(!podeCadastrarQuiz()||quizEnviando||(perfilAtual()==='professor'&&quizEditandoId!==null))return;
     const dados=capturarQuiz();if(!dados)return;
-    const editando=quizEditandoId,seq=quizSequencia,campos=Array.from(document.querySelectorAll('#quizCampos input,#quizCampos textarea,#quizCampos button')).map(el=>[el,el.disabled]);
+    if(perfilAtual()==='professor'){
+        const projeto=document.getElementById('quizCadastroProjeto').value,sub=document.getElementById('quizCadastroSubprojeto').value;
+        if(!quizCadastroPronto||!projeto){document.getElementById('quizFormAviso').textContent='Selecione um projeto e aguarde o carregamento dos subprojetos.';return;}
+        dados.projeto_id=Number(projeto);dados.subprojeto_id=sub?Number(sub):null;
+    }
+    const editando=quizEditandoId,seq=quizSequencia,campos=Array.from(document.querySelectorAll('#quizCampos input,#quizCampos textarea,#quizCampos select,#quizCampos button')).map(el=>[el,el.disabled]);
     quizEnviando=true;campos.forEach(([el])=>el.disabled=true);document.getElementById('quizSalvar').disabled=true;document.getElementById('quizFormAviso').textContent='Salvando...';
     try{
-        const resultado=confirmarOperacao(await apiFetch(`${API}/quizzes${editando?'/'+editando:''}`,{method:editando?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dados)}));
+        const resultado=confirmarOperacao(await apiFetch(apiGestaoQuizzes()+(editando?'/'+editando:''),{method:editando?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dados)}));
         if(!editando&&(!Number.isInteger(resultado.id)||resultado.id<=0))formatoInvalido();if(seq!==quizSequencia)return;
         if(editando){const abriu=await abrirQuiz(editando);if(!abriu&&perfilAtual()==='administrador'&&quizEditandoId===editando)document.getElementById('quizFormAviso').textContent='Não foi possível atualizar a visualização. A edição foi preservada; consulte o quiz antes de reenviar.';}else{for(const id of ['quizTitulo','quizDescricao'])document.getElementById(id).value='';document.getElementById('quizPerguntas').replaceChildren();document.getElementById('quizRevisao').replaceChildren();await showQuizzes();}
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;document.getElementById('quizFormAviso').textContent=erro.status===409?'Alteração bloqueada por histórico ou dependentes protegidos. A edição foi preservada.':'Não foi possível confirmar a gravação. O rascunho foi preservado.';mostrarErro(erro);}
@@ -147,6 +188,8 @@ function limparCatalogoQuizzes(){
     for(const id of ['catalogoQuizzesAluno','introducaoQuizAluno'])document.getElementById(id).style.display='none';
 }
 function limparDadosQuizzes(){
+    limparCadastroQuizProfessor();
+    document.getElementById('navQuizzesProfessor').classList.remove('open');
     limparCatalogoQuizzes();
     limparDisponibilidadeQuiz();
     quizSequencia++;quizEditandoId=null;quizDetalheId=null;
