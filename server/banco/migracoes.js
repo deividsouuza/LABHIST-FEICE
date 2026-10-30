@@ -1,5 +1,6 @@
 import resultados from './versoes/015-resultados-quizzes.js';
 import alunosSubprojetos from './versoes/016-alunos-subprojetos.js';
+import mensagens from './versoes/017-mensagens.js';
 import disponibilidade from './versoes/014-disponibilidade-quizzes.js';
 import crypto from 'node:crypto';
 import base from './versoes/001-base.js';
@@ -22,6 +23,6 @@ import recuperacao from './versoes/013-recuperacao-senha.js';
 
 // Manifesto ordenado e verificável. Versões publicadas não devem ser editadas;
 // evoluções futuras acrescentam uma nova versão, preservando os SQL anteriores.
-export const migracoes = [base, documentos, integridade, identidade, acessoDocumentos, limpeza, subprojetos, statusProjetos, quizzes, sessoes, autoria, textoDocumentos, recuperacao, disponibilidade, resultados, alunosSubprojetos]
+export const migracoes = [base, documentos, integridade, identidade, acessoDocumentos, limpeza, subprojetos, statusProjetos, quizzes, sessoes, autoria, textoDocumentos, recuperacao, disponibilidade, resultados, alunosSubprojetos, mensagens]
     .map(m => ({ ...m, checksum: crypto.createHash('sha256').update(JSON.stringify(m)).digest('hex') }));
 export const versaoEsperada = migracoes.at(-1).versao;

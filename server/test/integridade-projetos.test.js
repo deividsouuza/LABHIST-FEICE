@@ -110,7 +110,7 @@ describe('P10: FKs, diagnóstico e consistência em MySQL descartável real', { 
     });
     beforeEach(async () => {
         await banco.query('DROP TRIGGER IF EXISTS fixture_p10_falha');
-        for (const t of ['subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos', 'projeto_professor', 'projeto_aluno', 'projeto', 'professor', 'aluno']) await banco.query(`DELETE FROM ${t}`);
+        for (const t of ['mensagem','mensagem_conversa','subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos', 'projeto_professor', 'projeto_aluno', 'projeto', 'professor', 'aluno']) await banco.query(`DELETE FROM ${t}`);
         await banco.query("INSERT INTO professor (id,nome) VALUES (41,'Prof A'),(43,'Prof B')");
         await banco.query("INSERT INTO aluno (id,nome) VALUES (42,'Aluno A'),(44,'Aluno B')");
     });
@@ -184,7 +184,7 @@ describe('P10: atualização de legado em MySQL real, sem limpeza automática', 
         await banco.query("GRANT SELECT ON fixture_p01.* TO 'fixture_p10_diag'@'127.0.0.1'");
     });
     beforeEach(async () => {
-        for (const t of ['subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos','projeto_professor','projeto_aluno','projeto','professor','aluno','usuarios','schema_migrations']) await banco.query(`DROP TABLE IF EXISTS ${t}`);
+        for (const t of ['mensagem','mensagem_conversa','subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos','projeto_professor','projeto_aluno','projeto','professor','aluno','usuarios','schema_migrations']) await banco.query(`DROP TABLE IF EXISTS ${t}`);
         await executarMigracoes(banco, 2);
         await banco.query("INSERT INTO professor (id,nome) VALUES (41,'Fixture')");
         await banco.query("INSERT INTO aluno (id,nome) VALUES (42,'Fixture')");

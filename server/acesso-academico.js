@@ -1,5 +1,13 @@
 import { ErroHttp } from './erros-api.js';
 
+// Somente criação acadêmica; edição/exclusão continuam administrativas.
+export function requireCriacaoAcademica(req,res,next) {
+    if(!['administrador','professor'].includes(req.session.identidade?.perfil)) {
+        return res.status(403).json({erro:'Criação permitida apenas a administradores e professores.'});
+    }
+    next();
+}
+
 export async function autorizarProjeto(banco, projetoId, identidade, travar=false) {
     if (identidade.perfil==='administrador') {
         if (travar) {

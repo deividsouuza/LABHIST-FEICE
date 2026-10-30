@@ -4,6 +4,13 @@ let professoresDisponiveis = [];
 let selectedProjetoProfessores = [];
 let alunosDisponiveis = [];
 let selectedProjetoAlunos = [];
+let projetoFormularioSequencia=0;
+let projetoEnviando=false;
+function limparFormularioProjeto(){
+    if(projetoEnviando)return;
+    clearForm('formProjeto');
+    if(perfilAtual()==='professor')carregarParticipantesProjetoProfessor();
+}
 function resetProjetoProfessores() {
     selectedProjetoProfessores = [];
     renderSelectedProfessores();
@@ -45,7 +52,7 @@ function renderSelectedProfessores() {
                     <div class="selected-professor-name">${escHtml(prof.nome || prof.usuario || 'Professor')}</div>
                     <div class="selected-professor-meta">${escHtml(prof.matricula || prof.email || 'Professor vinculado ao projeto')}</div>
                 </div>
-                <button type="button" class="selected-professor-remove" onclick="removeProfessorFromProjeto(${prof.id})">Remover</button>
+                ${perfilAtual()==='administrador'?`<button type="button" class="selected-professor-remove" onclick="removeProfessorFromProjeto(${prof.id})">Remover</button>`:''}
             </div>
         `).join('');
     }
@@ -54,6 +61,7 @@ function renderSelectedProfessores() {
 }
 
 function addProfessorToProjeto() {
+    if(perfilAtual()!=='administrador')return;
     const select = document.getElementById('proj-professor');
     const selectedId = select?.value;
 
@@ -78,6 +86,7 @@ function addProfessorToProjeto() {
 }
 
 function removeProfessorFromProjeto(id) {
+    if(perfilAtual()!=='administrador')return;
     selectedProjetoProfessores = selectedProjetoProfessores.filter(prof => String(prof.id) !== String(id));
     renderSelectedProfessores();
 }
@@ -295,8 +304,28 @@ async function carregarAlunosSelect(selectedId = null) {
     } catch (erro) { mostrarErro(erro); }
 }
 
+async function carregarParticipantesProjetoProfessor(){
+    const seq=projetoFormularioSequencia,conta=sessaoAtual.conta_id;
+    const botao=document.getElementById('btnSubmitProjeto'),aviso=document.getElementById('projetoFormAviso');
+    alunosDisponiveis=[];renderAlunosSelect();botao.disabled=true;aviso.textContent='Carregando alunos...';
+    try{
+        const dados=(await apiFetch(`${API}/projetos/opcoes-criacao`)).dados;
+        const professores=validarLista(dados.professores,'professor'),alunos=validarLista(dados.alunos,'aluno');
+        if(seq!==projetoFormularioSequencia||sessaoAtual?.conta_id!==conta||perfilAtual()!=='professor')return;
+        if(professores.length!==1||professores[0].id!==getPessoaAtualId())formatoInvalido();
+        professoresDisponiveis=professores;alunosDisponiveis=alunos;
+        selectedProjetoProfessores=professores;renderSelectedProfessores();renderAlunosSelect();
+        aviso.textContent=alunos.length?'Você será vinculado automaticamente como professor responsável.':'Nenhum aluno cadastrado. Solicite o cadastro ao administrador antes de criar o projeto.';
+        botao.disabled=!alunos.length;
+    }catch(erro){
+        if(seq!==projetoFormularioSequencia||erro.sessaoExpirada)return;
+        aviso.textContent='Não foi possível carregar os alunos. Volte e abra o cadastro novamente.';mostrarErro(erro);
+    }
+}
+
 // ── Núcleo administrativo de quizzes ──────────────────
 async function editProjeto(id) {
+    if(perfilAtual()!=='administrador')return;
     try {
         const res = await apiFetch(API + '/projetos/' + id);
         const p = validarRegistro(res.dados, 'projeto');
@@ -322,6 +351,7 @@ async function editProjeto(id) {
         document.getElementById('proj-status').options[0].textContent=p.status==null?'Não informado (legado)':'Selecione um status...';
         renderSelectedProfessores(); renderSelectedAlunos();
         currentEditProjetoId = id;
+        document.getElementById('btnSubmitProjeto').disabled=false;
         setSubmitLabel('projeto', true);
         document.getElementById('listProjeto').style.display = 'none';
         document.getElementById('formProjeto').style.display = 'block';
@@ -330,6 +360,7 @@ async function editProjeto(id) {
 }
 
 async function submitProjeto() {
+    if(!['administrador','professor'].includes(perfilAtual())||projetoEnviando||(perfilAtual()==='professor'&&currentEditProjetoId!==null))return;
     const nome         = document.getElementById('proj-nome').value.trim();
     const descricao    = document.getElementById('proj-descricao').value.trim();
     const objetivo     = document.getElementById('proj-objetivo').value.trim();
@@ -345,6 +376,8 @@ async function submitProjeto() {
     if (professor_ids.length === 0) { alert('Adicione pelo menos um professor ao projeto.'); return; }
     if (aluno_ids.length === 0) { alert('Adicione pelo menos um aluno ao projeto.'); return; }
 
+    const seq=projetoFormularioSequencia,conta=sessaoAtual.conta_id;
+    projetoEnviando=true;document.getElementById('btnSubmitProjeto').disabled=true;
     try {
         let res;
         if (currentEditProjetoId !== null) {
@@ -361,9 +394,15 @@ async function submitProjeto() {
             });
         }
         const data = confirmarOperacao(res);
-        if (res.ok) { clearForm('formProjeto'); backToList('projeto'); }
+        if(seq!==projetoFormularioSequencia||sessaoAtual?.conta_id!==conta)return;
+        if (res.ok) {
+            clearForm('formProjeto');
+            if(perfilAtual()==='professor')await abrirSubprojetosProjeto(data.id);
+            else backToList('projeto');
+        }
         else alert(data.erro || 'Erro ao salvar projeto.');
-    } catch (erro) { mostrarErro(erro); }
+    } catch (erro) { if(seq===projetoFormularioSequencia)mostrarErro(erro); }
+    finally {projetoEnviando=false;if(seq===projetoFormularioSequencia)document.getElementById('btnSubmitProjeto').disabled=false;}
 }
 
 async function deleteProjeto(event, id) {

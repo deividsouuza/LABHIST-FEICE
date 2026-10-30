@@ -20,7 +20,7 @@ describe('P18/P19/P23/P24/P25/P26: interface no Chrome com respostas controladas
             else if(/^\/projetos\/\d+\/subprojetos$/.test(url.pathname)){
                 const pai=Number(url.pathname.split('/')[2]);
                 if(!projetos.has(pai)){status=404;data={erro:'Ausente'};}
-                else if(method==='POST'){if(papel!=='administrador'){status=403;data={erro:'Sem permissao'};}else{const id=Math.max(70,...subprojetos.keys())+1;subprojetos.set(id,{id,projeto_id:pai,...body});data={id,mensagem:'Cadastrado.'};}}
+                else if(method==='POST'){if(!['administrador','professor'].includes(papel)){status=403;data={erro:'Sem permissao'};}else{const id=Math.max(70,...subprojetos.keys())+1;subprojetos.set(id,{id,projeto_id:pai,...body});data={id,mensagem:'Cadastrado.'};}}
                 else data=[...subprojetos.values()].filter(s=>s.projeto_id===pai);
             }
             else if(/^\/subprojetos\/\d+$/.test(url.pathname)){
@@ -102,7 +102,7 @@ describe('P18/P19/P23/P24/P25/P26: interface no Chrome com respostas controladas
     for(const status of [403,404,500])it(`P24: POST ${status} preserva formulario e pai`,async()=>{
         await nav.evaluate('abrirSubprojetosProjeto(51)');falha={url:'/projetos/51/subprojetos',method:'POST',status};await nav.evaluate("novoSubprojeto();document.getElementById('sub-titulo').value='Preservado';document.getElementById('sub-objetivo').value='Objetivo';submitSubprojeto()");assert.equal(await nav.evaluate("document.getElementById('sub-titulo').value"),'Preservado');assert.equal(await nav.evaluate("document.getElementById('sub-objetivo').value"),'Objetivo');assert.equal(await nav.evaluate('contextoSubprojeto.projetoId'),51);assert.equal(await nav.evaluate("document.getElementById('formSubprojeto').style.display"),'block');assert.equal(subprojetos.size,0);
     });
-    for(const papelTeste of ['aluno','professor'])it(`P24: ${papelTeste} nao tem acao de escrita e chamada forjada nao envia`,async()=>{
+    for(const papelTeste of ['aluno'])it(`P24: ${papelTeste} nao tem acao de escrita e chamada forjada nao envia`,async()=>{
         await carregar(papelTeste);await nav.evaluate('abrirSubprojetosProjeto(51)');assert.equal(await nav.evaluate("document.getElementById('btnNovoSubprojeto').hidden"),true);await nav.evaluate("novoSubprojeto();document.getElementById('sub-titulo').value='Forjado';submitSubprojeto()");assert.equal(pedidos.some(p=>p.method==='POST'),false);assert.equal(await nav.evaluate("document.getElementById('formSubprojeto').style.display"),'none');
     });
     it('P24: duplo clique nao duplica e voltar mantem pai selecionado',async()=>{

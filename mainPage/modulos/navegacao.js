@@ -7,6 +7,8 @@ function toggleCadastros() {
 }
 
 function hideAll() {
+    pausarMensagens();
+    projetoFormularioSequencia++;
     resultadosProfessorSequencia++;document.getElementById("resultadosProfessor").style.display="none";
     historicoAlunoSequencia++;document.getElementById('historicoAluno').style.display='none';
     limparAtividadeQuizAluno();
@@ -104,6 +106,8 @@ function toggleCurso(btn) {
 }
 
 function showRegisterForm(type) {
+    if(perfilAtual()!=='administrador'&&!(type==='projeto'&&perfilAtual()==='professor'))return;
+    hideAll();
     currentEditId = null;
     currentEditProjetoId = null;
     clearForm(formMap[type].formId);
@@ -116,8 +120,8 @@ function showRegisterForm(type) {
     document.getElementById('breadcrumbCurrent').textContent = `Cadastrar ${map.formLabel}`;
 
     if (type === 'projeto') {
-        carregarProfessoresSelect();
-        carregarAlunosSelect();
+        if(perfilAtual()==='professor')carregarParticipantesProjetoProfessor();
+        else {carregarProfessoresSelect();carregarAlunosSelect();}
     }
 }
 
@@ -125,7 +129,8 @@ function backToList(type) {
     currentEditId = null;
     currentEditProjetoId = null;
     setSubmitLabel(type, false);
-    showForm(type);
+    if(type==='projeto'&&perfilAtual()==='professor')showMeusProjetos();
+    else showForm(type);
 }
 
 function setSubmitLabel(type, isEdit) {
@@ -146,10 +151,18 @@ function clearForm(formId) {
     panel.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
     panel.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
     if (formId === 'formProjeto') {
+        projetoFormularioSequencia++;
+        document.getElementById('projetoFormAviso').textContent='';
+        document.getElementById('btnSubmitProjeto').disabled=false;
+        document.getElementById('proj-professor-escolha').hidden=perfilAtual()==='professor';
         document.getElementById('proj-status').dataset.legado='0';
         document.getElementById('proj-status').options[0].textContent='Selecione um status...';
         resetProjetoProfessores();
         resetProjetoAlunos();
+        if(perfilAtual()==='professor'){
+            selectedProjetoProfessores=[{id:getPessoaAtualId(),nome:sessaoAtual.nome}];
+            renderSelectedProfessores();
+        }
     }
 }
 

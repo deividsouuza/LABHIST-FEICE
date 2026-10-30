@@ -14,6 +14,7 @@ Entrada: menuCadastro.html carrega configuracao-publica.js, assets/api.js, os de
 | modulos/documentos.js | preview/remoção de seleção, upload, lista e link de download autenticado | API/sessão, contexto atual de projeto e utilitários |
 | modulos/quizzes.js | CRUD administrativo, disponibilidade, catálogo/atividade/submissão do aluno e validadores compartilhados | API/sessão/navegação, limpeza de desempenho |
 | modulos/desempenho.js | sequências e telas de histórico próprio/acompanhamento professor | API/sessão/navegação e projeção/elementos de quiz |
+| modulos/mensagens.js; mensagens.css | conversas/contatos, histórico, envio/leitura, polling visível, rascunhos em memória e layout responsivo | API/sessão/navegação; cadastro.js registra os eventos |
 
 São módulos clássicos por responsabilidade, não ES modules: o HTML e as listas geradas já chamam handlers globais. Mantiveram-se os mesmos nomes/IDs, sem framework, bundler ou novo namespace global. let/const ficam no escopo lexical do documento; cada estado foi movido para o domínio proprietário. Não foram adicionadas globals para a extração. Remover essa compatibilidade exige migrar também HTML, handlers gerados e os consumidores; está fora desta extração.
 

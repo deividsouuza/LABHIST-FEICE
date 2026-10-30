@@ -63,6 +63,7 @@ describe('P02: autorização das operações administrativas', { concurrency: 1 
 
     for (const papel of ['anônimo', 'aluno', 'professor', 'visitante', 'outro-perfil', 'sem-perfil']) {
         for (const rota of mutacoes) {
+            if(papel==='professor'&&rota.nome==='criar projeto')continue; // Criação acadêmica coberta em HTTP/MySQL real.
             it(`${papel} não pode ${rota.nome}, mesmo forjando o perfil da requisição`, async () => {
                 const separador = rota.url.includes('?') ? '&' : '?';
                 const { resposta, data } = await requisitar(rota.metodo, rota.url + separador + 'role=administrador&usuario_id=1',

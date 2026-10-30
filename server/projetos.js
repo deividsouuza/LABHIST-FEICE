@@ -1,7 +1,7 @@
 import { executarTransacao } from './banco/transacao.js';
 import { validarProjetoPayload, confirmarMembros, ErroProjeto } from './projetos-validacao.js';
 import { ErroHttp, validarIdRota, exigirRegistro, conferirExclusao, responderErro } from './erros-api.js';
-import { autorizarProjeto } from './acesso-academico.js';
+import { autorizarProjeto, requireCriacaoAcademica } from './acesso-academico.js';
 import { enfileirarDocumentos } from './limpeza-arquivos.js';
 import { mapProfessorRow, mapAlunoRow } from './pessoas-dados.js';
 
@@ -155,7 +155,17 @@ export function registrarProjetos(app,{obterPool,requireAuth,requireAdmin,requir
         }
     });
 
-    app.post('/projetos', requireAuth, requireAdmin, validarProjetoPayload, async (req, res) => {
+    // Catálogo mínimo para o formulário acadêmico; não abre /usuarios nem contatos.
+    app.get('/projetos/opcoes-criacao',requireAuth,requireCriacaoAcademica,requireIdentidadeAtual,async(req,res)=>{
+        try {
+            const identidade=req.identidadeAcesso;
+            const [professores]=await obterPool().query('SELECT id,nome FROM professor'+(identidade.perfil==='professor'?' WHERE id=?':'')+' ORDER BY nome,id',identidade.perfil==='professor'?[identidade.pessoa_id]:[]);
+            const [alunos]=await obterPool().query('SELECT id,nome FROM aluno ORDER BY nome,id');
+            res.set('Cache-Control','no-store').json({professores,alunos});
+        }catch(erro){responderErro(res,erro,'Erro ao carregar participantes.');}
+    });
+
+    app.post('/projetos', requireAuth, requireCriacaoAcademica, requireIdentidadeAtual, validarProjetoPayload, async (req, res) => {
         if (!obterPool()) return res.status(500).json({ erro: 'Banco de dados nao conectado.' });
 
         const { nome, descricao, objetivo } = req.body;

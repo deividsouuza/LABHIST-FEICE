@@ -1,5 +1,7 @@
 // Contrato estrutural da API atual. Não introduz vínculos/regras acadêmicas novos.
 export const tabelas = {
+    mensagem_conversa:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',professor_conta_id:'INT NOT NULL',professor_id:'INT NOT NULL',aluno_conta_id:'INT NOT NULL',aluno_id:'INT NOT NULL',criada_em:'DATETIME NOT NULL',professor_leu_ate:'INT NOT NULL DEFAULT 0',aluno_leu_ate:'INT NOT NULL DEFAULT 0'},
+    mensagem:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',conversa_id:'INT NOT NULL',remetente_id:'INT NOT NULL',destinatario_id:'INT NOT NULL',cliente_id:'VARCHAR(36) NOT NULL',conteudo:'TEXT NOT NULL',enviada_em:'DATETIME NOT NULL',lida_em:'DATETIME NULL'},
     subprojeto_aluno:{subprojeto_id:'INT NOT NULL',projeto_id:'INT NOT NULL',aluno_id:'INT NOT NULL'},
     quiz_resultado:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',quiz_id:'INT NOT NULL',aluno_id:'INT NOT NULL',conta_id:'INT NOT NULL',quiz_titulo:'VARCHAR(255) NOT NULL',aluno_nome:'VARCHAR(255) NOT NULL',pontuacao:'INT NOT NULL',total_perguntas:'INT NOT NULL',percentual:'DOUBLE NOT NULL',concluido_em:'DATETIME NOT NULL'},
     quiz_resposta:{id:'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',resultado_id:'INT NOT NULL',pergunta_id:'INT NOT NULL',alternativa_id:'INT NOT NULL'},

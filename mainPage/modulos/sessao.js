@@ -4,6 +4,7 @@ function perfilAtual() { return sessaoAtual?.perfil || ''; }
 function getPessoaAtualId() { return sessaoAtual?.pessoa_id || ''; }
 
 function limparEstadoSessao() {
+    limparMensagens();
     limparDadosQuizzes();
     detalheProjetoSequencia++;
     subprojetoSequencia++;contextoSubprojeto=null;
@@ -11,6 +12,7 @@ function limparEstadoSessao() {
     subprojetoEditandoId=subprojetoDetalheAtualId=null;
     for(const campo of ['titulo','objetivo','descricao','temas_abordados'])document.getElementById('sub-'+campo).value='';
     sessaoAtual = null;
+    document.getElementById('btnNovoProjetoProfessor').hidden=true;
     dadosCarregados = {};
     projetosDaPessoaAtual = [];
     currentEditId = currentEditProjetoId = projetoAtualDetalheId = null;
@@ -35,6 +37,9 @@ async function logout() {
 
 function aplicarPermissoes() {
     const perfil = perfilAtual();
+    document.getElementById('navMensagens').style.display=['professor','aluno'].includes(perfil)?'':'none';
+    if(['professor','aluno'].includes(perfil))iniciarResumoMensagens();else limparMensagens();
+    document.getElementById('btnNovoProjetoProfessor').hidden=perfil!=='professor';
     document.getElementById("navResultadosProfessor").style.display=perfil==='professor'?'':'none';
     document.getElementById('navHistoricoAluno').style.display=perfil==='aluno'?'':'none';
     document.getElementById('navQuizzesAluno').style.display=perfil==='aluno'?'':'none';
@@ -55,7 +60,7 @@ async function inicializarSessao() {
         if (!res.ok) throw new Error('Não foi possível verificar seu acesso.');
         const dados = res.dados;
         if (!dados || !['administrador','aluno','professor'].includes(dados.perfil) || !Number.isInteger(dados.conta_id) || dados.conta_id<=0 || typeof dados.nome !== 'string' || (dados.perfil==='administrador' ? dados.pessoa_id!==null : !Number.isInteger(dados.pessoa_id)||dados.pessoa_id<=0)) throw new Error('Resposta de sessão inválida.');
-        if(sessaoAtual&&(sessaoAtual.conta_id!==dados.conta_id||sessaoAtual.perfil!==dados.perfil||sessaoAtual.pessoa_id!==dados.pessoa_id)){limparDadosQuizzes();limparParticipantesSubprojeto();}
+        if(sessaoAtual&&(sessaoAtual.conta_id!==dados.conta_id||sessaoAtual.perfil!==dados.perfil||sessaoAtual.pessoa_id!==dados.pessoa_id))limparEstadoSessao();
         sessaoAtual = Object.freeze(dados);
         for (const chave of ['perfil','usuario','alunoAtualId','professorAtualId']) localStorage.removeItem(chave);
         aplicarPermissoes();
@@ -63,6 +68,7 @@ async function inicializarSessao() {
         aviso.hidden = true;
         return true;
     } catch (erro) {
+        limparMensagens();
         sessaoAtual = null;
         aviso.querySelector('span').textContent = erro.sessaoExpirada ? 'Sessão encerrada.' : 'Não foi possível verificar seu acesso. Tente novamente.';
         return false;

@@ -24,7 +24,14 @@ export function validarProjetoPayload(req, res, next) {
         if (typeof body.nome !== 'string' || !body.nome.trim()) throw new ErroProjeto('Nome do projeto e obrigatorio.');
         const responsavel = body.professor_id === undefined ? undefined : idProjetoValido(body.professor_id);
         if (responsavel === null) throw new ErroProjeto('professor_id deve ser um inteiro positivo.');
-        const professorIds = listaIds(body.professor_ids === undefined ? (responsavel === undefined ? [] : [responsavel]) : body.professor_ids, 'Professores');
+        let professorIds = listaIds(body.professor_ids === undefined ? (responsavel === undefined ? [] : [responsavel]) : body.professor_ids, 'Professores');
+        if(req.method==='POST'&&req.identidadeAcesso?.perfil==='professor') {
+            const proprio=req.identidadeAcesso.pessoa_id;
+            if((responsavel!==undefined&&responsavel!==proprio)||(body.professor_ids!==undefined&&(professorIds.length!==1||professorIds[0]!==proprio))) {
+                throw new ErroProjeto('O professor responsável deve ser o próprio professor autenticado.',403);
+            }
+            professorIds=[proprio];
+        }
         const alunoIds = listaIds(body.aluno_ids === undefined ? [] : body.aluno_ids, 'Alunos');
         if (!professorIds.length) throw new ErroProjeto('Adicione pelo menos um professor ao projeto.');
         if (!alunoIds.length) throw new ErroProjeto('Adicione pelo menos um aluno ao projeto.');

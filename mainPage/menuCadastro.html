@@ -6,6 +6,7 @@
     <title>Sistema Labhist</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="menu.css">
+    <link rel="stylesheet" href="mensagens.css">
 </head>
 <body data-sessao="pendente">
     <div id="sessaoStatus" role="status"><span>Verificando acesso...</span> <button type="button" onclick="inicializarSessao()">Tentar novamente</button></div>
@@ -36,6 +37,7 @@
 
             <button class="nav-parent" id="navResultadosProfessor" type="button" onclick="showResultadosProfessor()" style="display:none;">Resultados acompanhados</button>
             <button class="nav-parent" id="navHistoricoAluno" type="button" onclick="showHistoricoAluno()" style="display:none;">Meu desempenho</button>
+            <button class="nav-parent" id="navMensagens" type="button" onclick="showMensagens()" style="display:none;"><span class="nav-parent-icon" aria-hidden="true">✉</span><span class="nav-parent-label">Mensagens</span><span id="mensagensContador" class="mensagens-contador" hidden>0</span></button>
 
             <!-- Cadastros (item pai) -->
             <button type="button" class="nav-parent" id="navParent" onclick="toggleCadastros()" aria-expanded="false" aria-controls="navChildren">
@@ -94,6 +96,33 @@
             </div>
 
             <!-- List: Meus Projetos (aluno e professor) -->
+            <section class="form-panel" id="painelMensagens" style="display:none;" aria-label="Mensagens privadas" data-conversa="0">
+                <div class="panel-accent-bar purple"></div>
+                <div class="panel-head"><div><div class="panel-head-label">comunicação</div><h1 class="panel-head-title">Mensagens</h1></div></div>
+                <div class="mensagens-grade">
+                    <aside class="mensagens-lateral" aria-label="Conversas e contatos">
+                        <div class="mensagens-abas"><button type="button" id="mensagensAbaConversas" class="btn-ghost" onclick="trocarListaMensagens('conversas')" aria-pressed="true">Conversas</button><button type="button" id="mensagensAbaContatos" class="btn-ghost" onclick="trocarListaMensagens('contatos')" aria-pressed="false">Nova conversa</button></div>
+                        <label class="form-label" for="mensagensBusca">Pesquisar por nome</label>
+                        <input type="search" class="form-input purple" id="mensagensBusca" maxlength="80" placeholder="Nome do participante" autocomplete="off">
+                        <p id="mensagensListaAviso" class="mensagens-aviso" role="status"></p>
+                        <div id="mensagensLista" class="mensagens-lista"></div>
+                        <div class="mensagens-paginas"><button type="button" class="btn-ghost" id="mensagensPaginaAnterior" onclick="paginarMensagens(-1)" disabled>Anterior</button><span id="mensagensPagina">1</span><button type="button" class="btn-ghost" id="mensagensPaginaProxima" onclick="paginarMensagens(1)" disabled>Próxima</button></div>
+                    </aside>
+                    <div class="mensagens-chat">
+                        <header class="mensagens-cabecalho"><button type="button" class="btn-ghost mensagens-voltar" onclick="voltarConversasMensagens()">← Conversas</button><div><h2 id="mensagensParticipante">Selecione uma conversa</h2><p id="mensagensPerfil">Converse com participantes dos seus projetos.</p></div></header>
+                        <p id="mensagensChatAviso" class="mensagens-aviso" role="status" aria-live="polite"></p>
+                        <button type="button" class="btn-ghost" id="mensagensAnteriores" hidden onclick="carregarAnterioresMensagens()">Carregar mensagens anteriores</button>
+                        <div id="mensagensHistorico" class="mensagens-historico" role="log" aria-label="Histórico da conversa" aria-live="polite" aria-relevant="additions" tabindex="0"></div>
+                        <button type="button" class="btn-ghost" id="mensagensNovas" hidden onclick="irAoFimMensagens()">Novas mensagens ↓</button>
+                        <form id="mensagensFormulario" class="mensagens-formulario">
+                            <label class="form-label" for="mensagensTexto">Sua mensagem</label>
+                            <textarea id="mensagensTexto" class="form-input purple" rows="3" maxlength="8000" placeholder="Escreva sua mensagem..." aria-describedby="mensagensLimite" disabled></textarea>
+                            <div class="mensagens-enviar"><span id="mensagensLimite">Até 4000 caracteres. Enter cria uma nova linha.</span><button type="submit" class="btn-submit" id="mensagensEnviar" disabled>Enviar</button></div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <div class="form-panel" id="listMeusProjetos" style="display:none;">
                 <div class="panel-accent-bar purple"></div>
                 <div class="panel-head">
@@ -109,6 +138,7 @@
                         <label class="form-label">Sua identidade</label>
                         <p id="pessoaAtualNome"></p>
                     </div>
+                    <button type="button" class="btn-submit" id="btnNovoProjetoProfessor" hidden onclick="showRegisterForm('projeto')">+ Cadastrar projeto</button>
                 </div>
                 <div class="panel-divider"></div>
                 <div class="panel-body" id="meusProjetosListBody" style="padding-bottom:1.75rem;"></div>
@@ -179,7 +209,7 @@
                     <div class="form-section"><label class="form-label" for="sub-objetivo">Objetivo</label><textarea class="form-input purple" id="sub-objetivo" rows="3"></textarea></div>
                     <div class="form-section"><label class="form-label" for="sub-descricao">Descrição</label><textarea class="form-input purple" id="sub-descricao" rows="4"></textarea></div>
                     <div class="form-section"><label class="form-label" for="sub-temas_abordados">Temas abordados</label><textarea class="form-input purple" id="sub-temas_abordados" rows="3"></textarea></div>
-                    <fieldset class="quiz-pergunta" id="subAlunos"><legend>Alunos envolvidos neste subprojeto</legend><p>Selecione os participantes entre os alunos do projeto principal. Um aluno pode participar de mais de um núcleo.</p><div id="subAlunosLista" class="sub-alunos-lista"></div></fieldset>
+                    <fieldset class="sub-alunos" id="subAlunos"><legend>Alunos envolvidos neste subprojeto</legend><p>Selecione os participantes entre os alunos do projeto principal. Um aluno pode participar de mais de um núcleo.</p><div id="subAlunosLista" class="sub-alunos-lista"></div></fieldset>
                     <p id="subprojetoFormAviso" role="status" aria-live="polite"></p>
                 </div>
                 <div class="panel-foot"><button class="btn-back" onclick="voltarListaSubprojetos()">← Voltar aos subprojetos</button><button class="btn-submit" id="btnSalvarSubprojeto" onclick="submitSubprojeto()">Cadastrar subprojeto</button></div>
@@ -447,7 +477,7 @@
                     </div>
                     <div class="form-section">
                         <label class="form-label" for="proj-professor">Professor Responsável</label>
-                        <div class="multi-select-row">
+                        <div class="multi-select-row" id="proj-professor-escolha">
                             <select class="form-input purple" id="proj-professor">
                                 <option value="">Selecione um professor...</option>
                             </select>
@@ -469,10 +499,11 @@
                             <div class="selected-empty">Nenhum aluno adicionado ao projeto.</div>
                         </div>
                     </div>
+                    <p id="projetoFormAviso" role="status" aria-live="polite"></p>
                 </div>
                 <div class="panel-foot">
                     <button class="btn-back" onclick="backToList('projeto')">← Voltar</button>
-                    <button class="btn-ghost" onclick="clearForm('formProjeto')">Limpar</button>
+                    <button class="btn-ghost" onclick="limparFormularioProjeto()">Limpar</button>
                     <button class="btn-submit" id="btnSubmitProjeto" onclick="submitProjeto()">Cadastrar Projeto</button>
                 </div>
             </div>
@@ -492,5 +523,6 @@
 <script src="modulos/documentos.js"></script>
 <script src="modulos/quizzes.js"></script>
 <script src="modulos/desempenho.js"></script>
+<script src="modulos/mensagens.js"></script>
 <script src="cadastro.js"></script>
 </html>

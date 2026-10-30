@@ -20,6 +20,7 @@ import { registrarSubprojetos } from './subprojetos.js';
 import { registrarQuizzes } from './quizzes.js';
 import { registrarRecuperacao } from './recuperacao.js';
 import { criarTransporte } from './email-recuperacao.js';
+import { registrarMensagens } from './mensagens.js';
 
 const configuracao = carregarConfiguracao();
 
@@ -77,6 +78,8 @@ registrarResultadosQuizzes(app,{obterPool:()=>pool,requireAuth,requireIdentidade
 registrarHistoricoAluno(app,{obterPool:()=>pool,requireAuth,requireIdentidadeAtual,responderErro});
 
 registrarAcompanhamentoProfessor(app,{obterPool:()=>pool,requireAuth,requireIdentidadeAtual,validarIdRota,responderErro});
+
+registrarMensagens(app,{obterPool:()=>pool,requireAuth,requireIdentidadeAtual});
 
 const recuperacao=registrarRecuperacao(app,{obterPool:()=>pool,requireAuth,requireAdmin,validarIdRota,responderErro,transporte:criarTransporte(configuracao.recuperacao),origemPublica:configuracao.recuperacao.origem,store:storeSessoes,limparCookie:res=>res.clearCookie('connect.sid',operacao.cookie)});
 

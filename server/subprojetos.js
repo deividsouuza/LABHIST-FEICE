@@ -1,7 +1,7 @@
 import { ErroHttp, conferirExclusao } from './erros-api.js';
 import { idProjetoValido } from './projetos-validacao.js';
 import { executarTransacao } from './banco/transacao.js';
-import { autorizarProjeto } from './acesso-academico.js';
+import { autorizarProjeto, requireCriacaoAcademica } from './acesso-academico.js';
 
 export function validarSubprojeto(req,res,next) {
     try{
@@ -62,11 +62,13 @@ async function exigirAusenciaDependentes(banco,id) {
 }
 
 export function registrarSubprojetos(app,{obterPool,requireAuth,requireAdmin,requireIdentidadeAtual,validarIdRota,responderErro}) {
-    app.post('/projetos/:id/subprojetos',requireAuth,requireAdmin,validarIdRota,validarSubprojeto,async(req,res)=>{
+    app.post('/projetos/:id/subprojetos',requireAuth,requireCriacaoAcademica,validarIdRota,requireIdentidadeAtual,validarSubprojeto,async(req,res)=>{
         try{
             const p=req.subprojetoPayload;
             if(p.projeto_id!==undefined&&p.projeto_id!==req.recursoId)throw new ErroHttp(400,'Projeto do corpo difere da URL.');
             const id=await executarTransacao(obterPool(),async banco=>{
+                // O vínculo deve existir e ficar protegido até concluir a gravação.
+                await autorizarProjeto(banco,req.recursoId,req.identidadeAcesso,true);
                 const [pais]=await banco.query('SELECT id FROM projeto WHERE id=? FOR SHARE',[req.recursoId]);
                 if(!pais.length)throw new ErroHttp(404,'Projeto nao encontrado.');
                 const [result]=await banco.query('INSERT INTO subprojeto (projeto_id,titulo,objetivo,descricao,temas_abordados) VALUES (?,?,?,?,?)',[req.recursoId,p.titulo,p.objetivo,p.descricao,p.temas_abordados]);

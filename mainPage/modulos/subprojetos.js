@@ -50,7 +50,7 @@ async function abrirSubprojetosProjeto(id) {
         contextoSubprojeto.nome=p.nome;
         contextoSubprojeto.alunos=validarAlunosSubprojeto(p.alunos||[]).map(a=>({id:a.id,nome:a.nome}));
         contextoSubprojeto.carregado=true;
-        document.getElementById('btnNovoSubprojeto').hidden=perfilAtual()!=='administrador';
+        document.getElementById('btnNovoSubprojeto').hidden=!['administrador','professor'].includes(perfilAtual());
         document.getElementById('subprojetosProjetoNome').textContent=p.nome;
         document.getElementById('breadcrumbCurrent').textContent=p.nome+' / Subprojetos';
         document.getElementById('subprojetosAviso').textContent='';
@@ -114,7 +114,7 @@ async function excluirSubprojeto(){
 }
 
 function novoSubprojeto(){
-    if(perfilAtual()!=='administrador'||!contextoSubprojeto?.carregado||subprojetoEnviando)return;
+    if(!['administrador','professor'].includes(perfilAtual())||!contextoSubprojeto?.carregado||subprojetoEnviando)return;
     hideAll();
     for(const campo of ['titulo','objetivo','descricao','temas_abordados'])document.getElementById('sub-'+campo).value='';
     document.getElementById('subprojetoFormProjeto').textContent=contextoSubprojeto.nome;
@@ -149,7 +149,7 @@ async function editarSubprojeto(id){
 }
 
 async function submitSubprojeto(){
-    if(perfilAtual()!=='administrador'||!contextoSubprojeto?.carregado||subprojetoEnviando)return;
+    if(!['administrador','professor'].includes(perfilAtual())||(perfilAtual()==='professor'&&subprojetoEditandoId!==null)||!contextoSubprojeto?.carregado||subprojetoEnviando)return;
     const dados={};
     for(const campo of ['titulo','objetivo','descricao','temas_abordados']){
         dados[campo]=document.getElementById('sub-'+campo).value.trim();

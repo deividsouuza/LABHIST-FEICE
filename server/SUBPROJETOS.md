@@ -6,11 +6,13 @@ Cada subprojeto pertence a um projeto existente. A FK é RESTRICT: projeto com s
 
 | Método e caminho | Permissão | Resposta |
 |---|---|---|
-| POST /projetos/:id/subprojetos | Administrador | 201, mensagem e id |
+| POST /projetos/:id/subprojetos | Administrador ou professor atualmente vinculado ao projeto | 201, mensagem e id |
 | GET /projetos/:id/subprojetos | Administrador ou acadêmico vinculado ao projeto | 200, lista ordenada por id |
 | GET /subprojetos/:id | Mesma regra do projeto pai | 200, detalhe para consulta/edição |
 | PUT /subprojetos/:id | Administrador | 200, mensagem; inclusive valores iguais |
 | DELETE /subprojetos/:id | Administrador | 200, mensagem; somente o alvo |
+
+A criação pelo professor foi acrescentada sem nova migração. Fluxo, vínculo automático ao criar o projeto e limites de permissão em [Criação pelo professor](CRIACAO-PROFESSOR.md).
 
 POST/PUT recebem um objeto JSON com titulo, objetivo, descricao e temas_abordados. Título é obrigatório, texto após trim de 1–255 caracteres, sem controles/quebras de linha. Os demais campos são textos opcionais: omitidos viram texto vazio, null/objetos/arrays são recusados; cada campo admite até 65535 bytes UTF-8 (coluna TEXT). Linhas e tabulações são permitidas nesses textos. PUT substitui os quatro campos; preencher a partir do GET para preservar opcionais. Não se impõe unicidade de título não prevista na ERS.
 

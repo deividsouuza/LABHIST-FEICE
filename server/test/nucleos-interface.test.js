@@ -1,3 +1,4 @@
+import {versaoEsperada} from '../banco/migracoes.js';
 import assert from 'node:assert/strict';
 import {before,beforeEach,after,describe,it} from 'node:test';
 import {fixtureProjetos} from './helpers/fixture-projetos.js';
@@ -15,8 +16,8 @@ describe('Núcleos: participantes de subprojeto, HTTP/MySQL/Chrome descartáveis
     beforeEach(async()=>{tempo+=900001;await f.banco.query('DROP TRIGGER IF EXISTS fixture_sa_falha');await f.preencher(2);});
     after(async()=>{if(nav)await nav.close();if(f)await f.fechar();assert.deepEqual(erros,[]);});
     it('migração015→016 preserva projetos/subprojetos sem atribuir alunos e é repetível',async()=>{
-        const c=await criar([]);await f.banco.query('DROP TABLE subprojeto_aluno');await f.banco.query('DELETE FROM schema_migrations WHERE versao=16');
-        const [antes]=await f.banco.query('SELECT * FROM subprojeto ORDER BY id');assert.deepEqual(await executarMigracoes(f.banco),{versao:16,aplicadas:[16]});assert.deepEqual((await f.banco.query('SELECT * FROM subprojeto ORDER BY id'))[0],antes);assert.deepEqual((await ler(c.data.id)).data.alunos,[]);assert.deepEqual(await executarMigracoes(f.banco),{versao:16,aplicadas:[]});
+        const c=await criar([]);await f.banco.query('DROP TABLE subprojeto_aluno');await f.banco.query('DELETE FROM schema_migrations WHERE versao>=16');
+        const [antes]=await f.banco.query('SELECT * FROM subprojeto ORDER BY id');assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:Array.from({length:versaoEsperada-15},(_,i)=>i+16)});assert.deepEqual((await f.banco.query('SELECT * FROM subprojeto ORDER BY id'))[0],antes);assert.deepEqual((await ler(c.data.id)).data.alunos,[]);assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:[]});
     });
     it('cria equipes distintas e um aluno participa de vários núcleos',async()=>{
         const a=await criar([42]),b=await criar([42,44],'Ludo');assert.equal(a.status,201);assert.equal(b.status,201);assert.deepEqual((await ler(a.data.id)).data.alunos,[{id:42,nome:'Aluno A'}]);assert.deepEqual((await ler(b.data.id)).data.alunos.map(a=>a.id),[42,44]);

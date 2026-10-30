@@ -1,0 +1,24 @@
+.mensagens-contador{background:var(--accent2);color:white;border-radius:1rem;padding:.1rem .5rem;font-size:.75rem;font-weight:700}
+.mensagens-grade{display:grid;grid-template-columns:minmax(230px,300px) minmax(0,1fr);border-top:1px solid var(--border);min-height:560px}
+.mensagens-lateral{padding:1rem;border-right:1px solid var(--border);min-width:0;display:flex;flex-direction:column;gap:.65rem}
+.mensagens-abas,.mensagens-paginas,.mensagens-enviar{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap}
+.mensagens-abas .btn-ghost[aria-pressed="true"]{color:var(--accent2);background:var(--surface2)}
+.mensagens-lista{max-height:520px;overflow-y:auto;min-height:100px}
+.mensagens-item{width:100%;padding:.85rem .6rem;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;display:grid;gap:.35rem;overflow-wrap:anywhere}
+.mensagens-item:hover,.mensagens-item[aria-current="true"]{background:var(--surface2)}
+.mensagens-item-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.mensagens-item strong{font-size:.85rem}.mensagens-item small{font-size:.7rem;color:var(--text-muted)}
+.mensagens-previa{font-size:.75rem;color:var(--text-muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:pre-wrap}
+.mensagens-chat{display:flex;flex-direction:column;min-width:0;min-height:560px}
+.mensagens-cabecalho{padding:1rem;display:flex;gap:.75rem;align-items:center;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.mensagens-cabecalho h2{font-size:1rem}.mensagens-cabecalho p,.mensagens-aviso{font-size:.8rem;color:var(--text-muted);line-height:1.6}
+.mensagens-aviso{padding:.5rem 1rem;overflow-wrap:anywhere}.mensagens-aviso:empty{padding:0}
+.mensagens-historico{height:390px;overflow-y:auto;overscroll-behavior:contain;padding:1rem;display:flex;flex-direction:column;gap:.8rem;align-items:flex-start}
+.mensagem-balao{max-width:85%;padding:.75rem 1rem;border-radius:14px 14px 14px 3px;background:var(--surface2);color:var(--text);overflow-wrap:anywhere;flex-shrink:0}
+.mensagem-propria{align-self:flex-end;background:#ede9fe;border-radius:14px 14px 3px 14px}
+.mensagem-balao p{white-space:pre-wrap;font-size:.85rem;line-height:1.6}.mensagem-balao footer{display:flex;gap:.65rem;justify-content:flex-end;flex-wrap:wrap;font-size:.65rem;color:var(--text-muted);margin-top:.4rem}
+.mensagem-nova{border-left:3px solid var(--accent2)}
+.mensagens-formulario{border-top:1px solid var(--border);padding:1rem;margin-top:auto}.mensagens-formulario textarea{resize:vertical;min-height:80px;max-height:220px;line-height:1.5}.mensagens-enviar{margin-top:.75rem}.mensagens-enviar span{font-size:.65rem;color:var(--text-muted)}
+.mensagens-voltar{display:none}#painelMensagens [hidden],#mensagensContador[hidden]{display:none}
+#painelMensagens button:disabled{opacity:.5;cursor:default;transform:none}
+@media(max-width:720px){.mensagens-grade{grid-template-columns:minmax(0,1fr);min-height:0}.mensagens-lateral{border-right:0}.mensagens-chat{display:none;min-height:0}.mensagens-voltar{display:inline-block}#painelMensagens[data-conversa="1"] .mensagens-lateral{display:none}#painelMensagens[data-conversa="1"] .mensagens-chat{display:flex}.mensagens-historico{height:45dvh;min-height:180px}.mensagem-balao{max-width:94%}.mensagens-cabecalho{align-items:flex-start;flex-wrap:wrap}.mensagens-formulario{padding:.75rem}.mensagens-enviar .btn-submit{max-width:100%}}

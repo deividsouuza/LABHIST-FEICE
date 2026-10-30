@@ -13,6 +13,10 @@ Em terminais que resolvem npm normalmente, pode usar npm no lugar de npm.cmd. A 
 
 ## Isolamento e pré-requisitos
 
+A extensão de criação acadêmica possui regressão HTTP/MySQL/Chrome em `criacao-professor-interface.test.js`, incluída no grupo navegador. Contratos e cobertura em [Criação pelo professor](CRIACAO-PROFESSOR.md).
+
+O chat possui `mensagens.test.js` no grupo banco e `mensagens-interface.test.js` no grupo navegador. A migração017 e os testes não dependem do `.env` real; ver [Mensagens](MENSAGENS.md).
+
 - test:seguranca: HTTP Express real com sessões fictícias e doubles SQL, validações, configuração, conteúdo de uploads e arquivos temporários. Não requer serviço MySQL nem navegador.
 - test:banco: executável local do MySQL Server; cria instâncias próprias em diretórios temporários, banco fixture_p01, portas efêmeras, sem my.ini (--no-defaults), sem serviço/dados/credenciais da aplicação. Inclui testes mistos com doubles. Não conecta ao banco de desenvolvimento.
 - test:navegador: Chrome/Edge e MySQL locais; perfil temporário próprio, sem perfil/clipboard pessoal. Os testes anteriores usam API/DB controlados. P41 acrescenta nove casos com navegador/HTTP/MySQL reais e SMTP fictício, incluindo o fluxo completo de recuperação e login; essa integração local comprova esse percurso, sem SMTP de produção. A suíte quizzes-academico-interface acrescenta Chrome/HTTP/MySQL reais para configuração, catálogo e respostas/resultados; simula apenas as falhas de rede especificadas.

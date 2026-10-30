@@ -964,7 +964,7 @@ body[data-sessao="pendente"] .sidebar-nav { visibility: hidden; }
 
 .texto-projeto { white-space: pre-wrap; overflow-wrap: anywhere; }
 .subprojeto-item { width:100%; color:inherit; text-align:left; font:inherit; }
-.quiz-pergunta { border:1px solid var(--border); border-radius:var(--radius-sm); margin:1rem 0; padding:1rem; min-width:0; }
+.quiz-pergunta,.sub-alunos { border:1px solid var(--border); border-radius:var(--radius-sm); margin:1rem 0; padding:1rem; min-width:0; }
 .quiz-alternativa { margin:0.75rem 0; display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:0.5rem; align-items:center; }
 .quiz-erro { display:block; color:var(--text); }
 .quiz-alternativa .quiz-erro { grid-column:1/-1; }
@@ -987,3 +987,4 @@ button.nav-parent,button.nav-child{width:100%;border:0;background:transparent;co
 @media(max-width:768px){.topbar{padding-left:1.25rem;padding-right:1.25rem}.panel-foot>*{max-width:100%;overflow-wrap:anywhere}.sidebar-nav{overflow-y:auto;min-height:0}}
 
 .sub-alunos-lista{max-height:20rem;overflow-y:auto;overflow-wrap:anywhere}
+#proj-professor-escolha[hidden],#btnNovoProjetoProfessor[hidden]{display:none}
