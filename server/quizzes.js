@@ -48,14 +48,14 @@ export async function carregarQuiz(banco,id,travar=false){
 
 export async function exigirQuizSemHistorico(banco,q,operacao='Edicao'){
     const ids={quiz:[q.id],quiz_pergunta:q.perguntas.map(p=>p.id),quiz_alternativa:q.perguntas.flatMap(p=>p.alternativas.map(a=>a.id))};
-    // Somente as duas relações internas pertencem ao núcleo. Qualquer outro
+    // Estrutura e convite por PIN pertencem ao núcleo. Qualquer outro
     // dependente precisa ser preservado, mesmo quando sua FK declara CASCADE.
     const [fks]=await banco.query(`SELECT TABLE_NAME,COLUMN_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME,
         TABLE_SCHEMA=DATABASE() AS esquema_local FROM information_schema.KEY_COLUMN_USAGE
         WHERE REFERENCED_TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME IN ('quiz','quiz_pergunta','quiz_alternativa')`);
     const citar=nome=>'`'+nome.replaceAll('`','``')+'`';
     for(const f of fks){
-        if(f.esquema_local&&f.REFERENCED_COLUMN_NAME==='id'&&((f.TABLE_NAME==='quiz_pergunta'&&f.COLUMN_NAME==='quiz_id'&&f.REFERENCED_TABLE_NAME==='quiz')||(f.TABLE_NAME==='quiz_alternativa'&&f.COLUMN_NAME==='pergunta_id'&&f.REFERENCED_TABLE_NAME==='quiz_pergunta')))continue;
+        if(f.esquema_local&&f.REFERENCED_COLUMN_NAME==='id'&&((f.TABLE_NAME==='quiz_pergunta'&&f.COLUMN_NAME==='quiz_id'&&f.REFERENCED_TABLE_NAME==='quiz')||(f.TABLE_NAME==='quiz_pin'&&f.COLUMN_NAME==='quiz_id'&&f.REFERENCED_TABLE_NAME==='quiz')||(f.TABLE_NAME==='quiz_alternativa'&&f.COLUMN_NAME==='pergunta_id'&&f.REFERENCED_TABLE_NAME==='quiz_pergunta')))continue;
         if(!f.esquema_local||f.REFERENCED_COLUMN_NAME!=='id')throw new ErroHttp(409,'Dependencias do quiz precisam de politica explicita.');
         const referencias=ids[f.REFERENCED_TABLE_NAME];if(!referencias.length)continue;
         const [rows]=await banco.query(`SELECT 1 FROM ${citar(f.TABLE_NAME)} WHERE ${citar(f.COLUMN_NAME)} IN (?) LIMIT 1`,[referencias]);
@@ -71,6 +71,7 @@ async function atualizarQuiz(banco,id,dados){
         for(const a of p.alternativas)if(a.id!==undefined&&(!p.id||!perguntas.get(p.id).alternativas.some(v=>v.id===a.id)))falhar('Alternativa nao pertence a pergunta.');
     }
     await banco.query('UPDATE quiz SET titulo=?,descricao=? WHERE id=?',[dados.titulo,dados.descricao,id]);
+    await banco.query('UPDATE quiz_pin SET versao=versao+1 WHERE quiz_id=?',[id]);
     for(const [ordem,p] of dados.perguntas.entries()){
         if(p.id===undefined){await inserirPergunta(banco,id,p,ordem);continue;}
         await banco.query('UPDATE quiz_pergunta SET descricao=?,ordem=? WHERE id=?',[p.descricao,ordem,p.id]);
@@ -111,6 +112,7 @@ export function registrarQuizzes(app,{obterPool,requireAuth,requireAdmin,validar
                 const q=await carregarQuiz(banco,req.recursoId,true);await exigirQuizSemHistorico(banco,q,'Exclusao');
                 if(q.perguntas.length)await banco.query('DELETE FROM quiz_alternativa WHERE pergunta_id IN (?)',[q.perguntas.map(p=>p.id)]);
                 await banco.query('DELETE FROM quiz_pergunta WHERE quiz_id=?',[q.id]);
+                await banco.query('DELETE FROM quiz_pin WHERE quiz_id=?',[q.id]);
                 const [r]=await banco.query('DELETE FROM quiz WHERE id=?',[q.id]);if(r.affectedRows!==1)throw new ErroHttp(409,'Exclusao do quiz nao confirmada.');
             });res.json({mensagem:'Quiz excluido.'});
         }catch(erro){responderErro(res,erro);}

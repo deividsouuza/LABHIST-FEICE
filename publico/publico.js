@@ -38,3 +38,9 @@ async function abrirQuizPublico(id){
     catch(e){if(seq===sequenciaQuizPublico)el('quizzesPublicosAviso').textContent=e instanceof SyntaxError?'Resposta inválida. Tente novamente.':e.message;}
 }
 el('quizzesPublicosAbrir').onclick=listarQuizzesPublicos;el('quizzesPublicosCarregar').onclick=listarQuizzesPublicos;el('quizPublicoVoltar').onclick=listarQuizzesPublicos;
+
+const participacaoPin=LabhistQuizPin.montar(el('quizPinVisitante'),{modo:'visitante'});
+const pinCompartilhado=new URL(window.location.href).searchParams.get('pin');
+if(pinCompartilhado&&/^\d{8}$/.test(pinCompartilhado))participacaoPin.abrir(pinCompartilhado);
+else participacaoPin.restaurar();
+window.addEventListener('pagehide',()=>participacaoPin.pausar());

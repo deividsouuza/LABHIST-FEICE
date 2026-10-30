@@ -23,7 +23,7 @@ describe('P35: respostas/resultados transacionais HTTP/MySQL reais descartáveis
     });
     beforeEach(async()=>{
         tempo+=900001;f.app.configurarBancoDeTeste(adaptador());
-        await f.banco.query('DROP TRIGGER IF EXISTS fixture_resultado_falha');for(const t of ['quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);
+        await f.banco.query('DROP TRIGGER IF EXISTS fixture_resultado_falha');for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);
         await f.banco.query("INSERT IGNORE INTO conta_pessoa (usuario_id,perfil,aluno_id) VALUES (142,'aluno',42)");await f.preencher(2);await f.banco.query('DELETE FROM projeto_aluno WHERE projeto_id=52 AND aluno_id=42');f.cookies.aluno=await login();
         const c=await escrever('/quizzes',payload(),'administrador','POST');assert.equal(c.status,201);id=c.data.id;q=(await f.request('/quizzes/'+id)).data;
         assert.equal((await escrever('/quizzes/'+id+'/disponibilidade',{projeto_id:51,subprojeto_id:null,estado:'publicado',publico:false})).status,200);

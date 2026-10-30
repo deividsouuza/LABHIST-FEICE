@@ -1,3 +1,4 @@
+import {versaoEsperada} from '../banco/migracoes.js';
 import assert from 'node:assert/strict';
 import {before,beforeEach,after,describe,it} from 'node:test';
 import {fixtureProjetos} from './helpers/fixture-projetos.js';
@@ -22,14 +23,14 @@ describe('Professor cadastra quizzes: HTTP/MySQL/Chrome isolados',{concurrency:1
     });
     beforeEach(async()=>{
         tempo+=900001;await nav.send('Page.navigate',{url:'about:blank'});await f.banco.query('DROP TRIGGER IF EXISTS fixture_quiz_prof_falha');
-        for(const t of ['quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);await f.preencher(2);await f.banco.query('UPDATE projeto_professor SET professor_id=43 WHERE projeto_id=52');
+        for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);await f.preencher(2);await f.banco.query('UPDATE projeto_professor SET professor_id=43 WHERE projeto_id=52');
     });
     after(async()=>{if(nav)await nav.close();if(f)await f.fechar();assert.deepEqual(erros,[]);});
     it('migra17→18 sem deduzir autores para quizzes legados nem mudar conteúdo/versões antigas',async()=>{
         const c=await gravar('/quizzes',conteudo(),'administrador');assert.equal(c.status,201);
-        await f.banco.query('ALTER TABLE quiz DROP FOREIGN KEY labhist_fk_quiz_autor_conta');await f.banco.query('ALTER TABLE quiz DROP FOREIGN KEY labhist_fk_quiz_autor_professor');await f.banco.query('ALTER TABLE quiz DROP CHECK labhist_quiz_autoria');await f.banco.query('ALTER TABLE quiz DROP COLUMN autor_conta_id,DROP COLUMN autor_professor_id');await f.banco.query('DELETE FROM schema_migrations WHERE versao=18');
-        const [antes]=await f.banco.query('SELECT * FROM schema_migrations ORDER BY versao');assert.deepEqual(await executarMigracoes(f.banco),{versao:18,aplicadas:[18]});assert.deepEqual((await f.banco.query('SELECT * FROM schema_migrations WHERE versao<=17 ORDER BY versao'))[0],antes);
-        const [rows]=await f.banco.query('SELECT titulo,autor_conta_id,autor_professor_id FROM quiz WHERE id=?',[c.data.id]);assert.equal(rows[0].titulo,conteudo().titulo);assert.equal(rows[0].autor_conta_id,null);assert.equal(rows[0].autor_professor_id,null);assert.deepEqual(await executarMigracoes(f.banco),{versao:18,aplicadas:[]});
+        await f.banco.query('ALTER TABLE quiz DROP FOREIGN KEY labhist_fk_quiz_autor_conta');await f.banco.query('ALTER TABLE quiz DROP FOREIGN KEY labhist_fk_quiz_autor_professor');await f.banco.query('ALTER TABLE quiz DROP CHECK labhist_quiz_autoria');await f.banco.query('ALTER TABLE quiz DROP COLUMN autor_conta_id,DROP COLUMN autor_professor_id');await f.banco.query('DELETE FROM schema_migrations WHERE versao>=18');
+        const [antes]=await f.banco.query('SELECT * FROM schema_migrations ORDER BY versao');assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:Array.from({length:versaoEsperada-17},(_,i)=>i+18)});assert.deepEqual((await f.banco.query('SELECT * FROM schema_migrations WHERE versao<=17 ORDER BY versao'))[0],antes);
+        const [rows]=await f.banco.query('SELECT titulo,autor_conta_id,autor_professor_id FROM quiz WHERE id=?',[c.data.id]);assert.equal(rows[0].titulo,conteudo().titulo);assert.equal(rows[0].autor_conta_id,null);assert.equal(rows[0].autor_professor_id,null);assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:[]});
     });
     it('professor cria rascunho privado, autoria vem da sessão e estrutura persiste integralmente',async()=>{
         const r=await criar();assert.equal(r.status,201);const [rows]=await f.banco.query('SELECT * FROM quiz WHERE id=?',[r.data.id]),q=rows[0];assert.equal(q.autor_conta_id,41);assert.equal(q.autor_professor_id,41);assert.equal(q.projeto_id,51);assert.equal(q.estado,'rascunho');assert.equal(q.introducao_publica,0);
@@ -90,7 +91,7 @@ describe('Professor cadastra quizzes: HTTP/MySQL/Chrome isolados',{concurrency:1
     const preencher=`document.getElementById('quizTitulo').value='Quiz criado pelo professor';document.getElementById('quizDescricao').value='Introdução';document.querySelector('#quizPerguntas .quiz-pergunta-texto').value='Questão';document.querySelectorAll('#quizPerguntas .quiz-alternativa-texto').forEach((e,i)=>e.value='Resposta '+i);document.querySelector('#quizPerguntas .quiz-correta').checked=true;`;
     it('Chrome: professor monta perguntas, escolhe projeto/subprojeto, salva e consulta seu quiz',async()=>{
         const sub=await gravar('/projetos/51/subprojetos',{titulo:'Ludo'},'administrador');await abrirCadastro();await nav.evaluate('document.getElementById("quizCadastroSubprojeto").value='+JSON.stringify(String(sub.data.id)));await nav.evaluate(preencher+'revisarQuiz();submitQuiz()');
-        assert.equal(await nav.evaluate('document.getElementById("quizLista").textContent.includes("Quiz criado pelo professor")'),true);const [[q]]=await f.banco.query('SELECT id,subprojeto_id FROM quiz');assert.equal(q.subprojeto_id,sub.data.id);await nav.evaluate('abrirQuiz('+q.id+')');
+        assert.equal(await nav.evaluate('document.getElementById("quizDetalheTitulo").textContent.includes("Quiz criado pelo professor")'),true);const [[q]]=await f.banco.query('SELECT id,subprojeto_id FROM quiz');assert.equal(q.subprojeto_id,sub.data.id);await nav.evaluate('abrirQuiz('+q.id+')');
         assert.equal(await nav.evaluate('document.getElementById("quizDetalheCorpo").textContent.includes("(correta)")'),true);for(const id of ['quizEditar','quizExcluir','quizDisponibilidade'])assert.equal(await nav.evaluate('document.getElementById('+JSON.stringify(id)+').hidden'),true);
     });
     it('Chrome: erro preserva conteúdo e seleção; campos cabem em celular',async()=>{

@@ -18,7 +18,7 @@ describe('Pré-P34: vínculo/publicação em HTTP/MySQL descartáveis reais',{sk
     before(async()=>{f=await fixtureProjetos();});
     beforeEach(async()=>{
         await f.banco.query('DROP TABLE IF EXISTS fixture_historico_quiz');await f.banco.query('DROP TRIGGER IF EXISTS fixture_disponibilidade_falha');
-        for(const t of ['quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);
+        for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);
         await f.preencher(2);await f.banco.query('DELETE FROM projeto_aluno WHERE projeto_id=52 AND aluno_id=42');
         const r=await f.request('/quizzes','administrador',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(quizFixture())});assert.equal(r.status,201);id=r.data.id;
     });

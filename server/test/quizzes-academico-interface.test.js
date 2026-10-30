@@ -31,7 +31,7 @@ describe('Quizzes acadêmicos: Chrome/HTTP/MySQL reais descartáveis',{skip:!chr
         await nav.send('Page.navigate',{url:f.origem+'/mainPage/menuCadastro.html'});await nav.waitFor('document.body && document.body.dataset.sessao==="confirmada"');
     }
     beforeEach(async()=>{
-        tempo+=900001;modo=null;envios.length=0;await f.banco.query('DROP TRIGGER IF EXISTS fixture_quiz_browser_falha');for(const t of ['quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);await f.preencher(1);
+        tempo+=900001;modo=null;envios.length=0;await f.banco.query('DROP TRIGGER IF EXISTS fixture_quiz_browser_falha');for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query('DELETE FROM '+t);await f.preencher(1);
         const c=await escrever('/quizzes',payload(),'administrador','POST');assert.equal(c.status,201);id=c.data.id;await carregar();
     });
     after(async()=>{if(nav)await nav.close();if(f)await f.fechar();assert.deepEqual(erros,[]);});

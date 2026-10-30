@@ -9,7 +9,8 @@ Sistema web para organização de projetos e pesquisas em História, com perfis 
 - Projetos, status e subprojetos/núcleos com seleção dos alunos envolvidos.
 - Documentos e imagens vinculados aos projetos, com descrição, texto explicativo e download autenticado.
 - Quizzes de escolha única, publicação, respostas, resultados e histórico do aluno.
-- Professores cadastram quizzes dos seus projetos como rascunho para publicação pelo administrador.
+- Professores cadastram quizzes dos seus projetos; a publicação no catálogo é feita pelo administrador.
+- Quizzes do professor geram PIN para alunos e visitantes responderem, com correção no servidor e histórico separado para visitantes.
 - Acompanhamento de resultados pelo professor, conforme os vínculos atuais do projeto.
 - Sessões persistidas e recuperação de senha por e-mail quando o SMTP estiver configurado.
 - Mensagens privadas entre professores e alunos com projetos em comum, histórico e confirmação de leitura.
@@ -46,7 +47,7 @@ node --env-file=.env index.js
 
 Acesse [Login](http://localhost:3000/login/login.html) ou [Área pública](http://localhost:3000/publico/index.html). Mantenha o terminal aberto durante o uso.
 
-O esquema atual é a versão 018. Para atualizar um banco existente, faça backup e pare o servidor antes de aplicar migrações. As versões publicadas são preservadas e não há DDL automático na inicialização.
+O esquema atual é a versão 019. Para atualizar um banco existente, faça backup e pare o servidor antes de aplicar migrações. As versões publicadas são preservadas e não há DDL automático na inicialização.
 
 Não há conta nem senha padrão distribuída. Contas de instalações existentes permanecem no banco local; uma instalação vazia exige provisionamento administrativo explícito. Para contas legadas, veja [autenticação](server/AUTENTICACAO.md) e [identidade acadêmica](server/IDENTIDADE-ACADEMICA.md). O SMTP é opcional para iniciar o sistema, mas é necessário para enviar e-mails de recuperação.
 
@@ -76,6 +77,8 @@ Permissões de criação acadêmica e procedimento de uso: [projetos pelo profes
 Permissões, rotas e ativação do chat: [mensagens privadas](server/MENSAGENS.md).
 
 Cadastro, autoria e ativação dos quizzes acadêmicos: [quizzes pelo professor](server/QUIZZES-PROFESSOR.md).
+
+Participação de alunos/visitantes por código e migração019: [PIN do Quiz](server/QUIZ-PIN.md).
 
 O Git ignora .env, node_modules, uploads, backups, logs e capturas locais de apresentação. O modelo server/.env.example é incluído sem segredos. Os certificados e a chave em server/test/fixtures são exclusivos dos ensaios HTTPS locais e não são credenciais de produção.
 

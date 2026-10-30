@@ -20,7 +20,7 @@ describe('P04: instalação e atualização em MySQL descartável real', { skip:
     });
     beforeEach(async () => {
         // Apenas o schema da instância criada por esta suíte, nunca o banco do projeto.
-        for (const tabela of ['mensagem','mensagem_conversa','subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos', 'projeto_aluno', 'projeto_professor', 'projeto', 'aluno', 'professor', 'usuarios', 'schema_migrations']) {
+        for (const tabela of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','mensagem','mensagem_conversa','subprojeto_aluno','quiz_resposta','quiz_resultado','recuperacao_senha','contatos_recuperacao','sessoes','quiz_alternativa','quiz_pergunta','quiz','subprojeto', 'limpeza_arquivos', 'conta_pessoa', 'documentos', 'projeto_aluno', 'projeto_professor', 'projeto', 'aluno', 'professor', 'usuarios', 'schema_migrations']) {
             await banco.query(`DROP TABLE IF EXISTS \`${tabela}\``);
         }
     });

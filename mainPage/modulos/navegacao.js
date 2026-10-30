@@ -7,6 +7,7 @@ function toggleCadastros() {
 }
 
 function hideAll() {
+    pausarQuizPinAluno();limparGestaoPinQuiz();
     pausarMensagens();
     projetoFormularioSequencia++;
     resultadosProfessorSequencia++;document.getElementById("resultadosProfessor").style.display="none";

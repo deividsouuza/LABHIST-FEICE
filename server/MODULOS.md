@@ -16,6 +16,7 @@ Entrada: index.js (Node.js ES modules). Mantém a inicialização autorizada: co
 | subprojetos.js; quizzes.js; recuperacao.js | Registradores de domínios já extraídos; preservam os contratos anteriores. |
 | mensagens.js; banco/mensagens-esquema.js | Chat privado por vínculo acadêmico atual, envio/leitura transacionais, paginação/idempotência e verificação da migração017. Contratos em MENSAGENS.md. |
 | quizzes-professor.js | Cadastro de rascunhos e consulta dos próprios quizzes por professor vinculado, com autoria018. Reutiliza validação/inserção/carregamento de quizzes.js, sem abrir o CRUD administrativo. |
+| quiz-pin.js; banco/pin-esquema.js | Convites por PIN, participação autenticada/anônima, correção compartilhada, gestão por autor e verificação019. Contratos e ciclo de acesso em QUIZ-PIN.md. |
 
 Os registradores recebem obterPool, função que consulta o pool atual quando a requisição chega. Não capturam um pool nulo antes da conexão nem abrem conexões próprias. Express, validações, SQL, códigos de resposta e ordem dos guards foram preservados; requireAuth e requireAdmin precedem validação/SQL das operações administrativas. Serviços importados mantêm transações e autorização no servidor. Documentos não importam projetos: a conclusão da limpeza é passada pelo bootstrap, evitando dependência circular. Não foi acrescentada versão de esquema em P45.
 

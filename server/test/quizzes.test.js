@@ -10,7 +10,7 @@ const novo=()=>({titulo:'Memórias do bairro',descricao:'Descrição\nLinha2',pe
 describe('P27/P29: quizzes privados em HTTP/MySQL descartaveis reais',{skip:!mysqlDisponivel,concurrency:1},()=>{
     let f;const escrever=(method,body,url='/quizzes',papel='administrador')=>f.request(url,papel,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     before(async()=>{f=await fixtureProjetos();});
-    beforeEach(async()=>{await f.banco.query('DROP TABLE IF EXISTS fixture_resposta_quiz');await f.banco.query('DROP TRIGGER IF EXISTS fixture_quiz_falha');for(const t of ['quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query(`DELETE FROM ${t}`);await f.preencher(1);});
+    beforeEach(async()=>{await f.banco.query('DROP TABLE IF EXISTS fixture_resposta_quiz');await f.banco.query('DROP TRIGGER IF EXISTS fixture_quiz_falha');for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query(`DELETE FROM ${t}`);await f.preencher(1);});
     after(async()=>{if(f)await f.fechar();});
     async function ler(id){const r=await f.request('/quizzes/'+id);assert.equal(r.status,200);return r.data;}
     it('P27: estrutura com perguntas/alternativas persiste em ordem e nomes Unicode',async()=>{
@@ -38,7 +38,7 @@ describe('P27/P29: quizzes privados em HTTP/MySQL descartaveis reais',{skip:!mys
         await assert.rejects(f.banco.query("INSERT INTO quiz_pergunta (quiz_id,descricao,ordem) VALUES (999,'Orfa',0)"));const c=await escrever('POST',novo()),q=await ler(c.data.id);await assert.rejects(f.banco.query('UPDATE quiz_alternativa SET correta=2 WHERE id=?',[q.perguntas[0].alternativas[0].id]));
     });
     it('P27: migra008→009 sem alterar projetos e repete sem DDL',async()=>{
-        for(const t of ['quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query(`DROP TABLE ${t}`);await f.banco.query('DELETE FROM schema_migrations WHERE versao>=9');const [antes]=await f.banco.query('SELECT * FROM projeto');assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:Array.from({length:versaoEsperada-9+1},(_,i)=>i+9)});assert.deepEqual((await f.banco.query('SELECT * FROM projeto'))[0],antes);assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:[]});
+        for(const t of ['quiz_resposta_visitante','quiz_resultado_visitante','quiz_pin','quiz_resposta','quiz_resultado','quiz_alternativa','quiz_pergunta','quiz'])await f.banco.query(`DROP TABLE ${t}`);await f.banco.query('DELETE FROM schema_migrations WHERE versao>=9');const [antes]=await f.banco.query('SELECT * FROM projeto');assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:Array.from({length:versaoEsperada-9+1},(_,i)=>i+9)});assert.deepEqual((await f.banco.query('SELECT * FROM projeto'))[0],antes);assert.deepEqual(await executarMigracoes(f.banco),{versao:versaoEsperada,aplicadas:[]});
     });
     it('P27: partida rejeita FK removida apesar do historico completo',async()=>{
         await f.banco.query('ALTER TABLE quiz_pergunta DROP FOREIGN KEY labhist_fk_pergunta_quiz');try{await assert.rejects(verificarEsquema(f.banco),/FK de quiz/);}finally{await f.banco.query('ALTER TABLE quiz_pergunta ADD CONSTRAINT labhist_fk_pergunta_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE RESTRICT ON UPDATE RESTRICT');}

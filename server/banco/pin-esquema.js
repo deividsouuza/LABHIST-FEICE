@@ -1,0 +1,9 @@
+import {restricaoAplicada,ErroIntegridade} from './integridade-projetos.js';
+export async function verificarPin(banco){
+    for(const [tabela,coluna,referencia] of [['quiz_pin','quiz_id','quiz'],['quiz_resultado_visitante','quiz_id','quiz'],['quiz_resposta_visitante','resultado_id','quiz_resultado_visitante'],['quiz_resposta_visitante','pergunta_id','quiz_pergunta'],['quiz_resposta_visitante','alternativa_id','quiz_alternativa']])if(!await restricaoAplicada(banco,{tipo:'fk',tabela,coluna,referencia}))throw new ErroIntegridade('FK de PIN/participação ausente ou incompatível.');
+    for(const [tabela,colunas,nome] of [['quiz_pin',['quiz_id'],'PRIMARY'],['quiz_pin',['codigo'],'codigo'],['quiz_resultado_visitante',['participacao_hash'],'participacao_hash'],['quiz_resposta_visitante',['resultado_id','pergunta_id'],'labhist_uq_rv_resposta']])if(!await restricaoAplicada(banco,{tipo:'unique',tabela,colunas,nome}))throw new ErroIntegridade('Unicidade de PIN/participação ausente.');
+    for(const [tabela,nome,esperado] of [['quiz_pin','labhist_pin_valido','char_lengthcodigo=8andativoin0,1andversao>=1'],['quiz_resultado_visitante','labhist_rv_valido','pontuacao>=0andtotal_perguntas>=1andpontuacao<=total_perguntasandpercentual>=0andpercentual<=100']]){
+        const [rows]=await banco.query(`SELECT c.CHECK_CLAUSE AS regra,t.ENFORCED AS enforced FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA=c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME=c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA=DATABASE() AND t.TABLE_NAME=? AND t.CONSTRAINT_NAME=?`,[tabela,nome]);
+        if(rows.length!==1||rows[0].enforced!=='YES'||rows[0].regra.toLowerCase().replace(/[\s\x60()]/g,'')!==esperado)throw new ErroIntegridade('Regra de PIN/participação ausente ou incompatível.');
+    }
+}

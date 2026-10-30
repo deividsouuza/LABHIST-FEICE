@@ -124,8 +124,8 @@ async function abrirQuiz(id){
     if(!podeCadastrarQuiz()||!Number.isInteger(id)||id<=0)return;
     const seq=++quizSequencia;
     try{const q=validarQuizResposta((await apiFetch(apiGestaoQuizzes()+'/'+id)).dados);if(q.id!==id)formatoInvalido();if(seq!==quizSequencia)return;
-        hideAll();quizDetalheId=id;document.getElementById('quizDetalheAviso').textContent=perfilAtual()==='professor'?'Estado: '+q.estado+'. A publicação e as alterações são feitas pelo administrador.':'';document.getElementById('detalheQuiz').style.display='block';marcarNavegacaoQuizzes();document.getElementById('quizDetalheTitulo').textContent=q.titulo;document.getElementById('breadcrumbCurrent').textContent=q.titulo;renderEstruturaQuiz(document.getElementById('quizDetalheCorpo'),q);
-        for(const id of ['quizDisponibilidade','quizEditar','quizExcluir'])document.getElementById(id).hidden=perfilAtual()!=='administrador';return true;
+        hideAll();quizDetalheId=id;document.getElementById('quizDetalheAviso').textContent=perfilAtual()==='professor'?'Estado no catálogo: '+q.estado+'. O PIN ativo permite responder. A publicação no catálogo e as alterações são feitas pelo administrador.':'';document.getElementById('detalheQuiz').style.display='block';marcarNavegacaoQuizzes();document.getElementById('quizDetalheTitulo').textContent=q.titulo;document.getElementById('breadcrumbCurrent').textContent=q.titulo;renderEstruturaQuiz(document.getElementById('quizDetalheCorpo'),q);
+        for(const id of ['quizDisponibilidade','quizEditar','quizExcluir'])document.getElementById(id).hidden=perfilAtual()!=='administrador';if(perfilAtual()==='professor')mostrarGestaoPinQuiz(q.pin??null);return true;
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;mostrarErro(erro);}
 }
 async function excluirQuiz(id=quizDetalheId){
@@ -167,7 +167,7 @@ async function submitQuiz(){
     try{
         const resultado=confirmarOperacao(await apiFetch(apiGestaoQuizzes()+(editando?'/'+editando:''),{method:editando?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dados)}));
         if(!editando&&(!Number.isInteger(resultado.id)||resultado.id<=0))formatoInvalido();if(seq!==quizSequencia)return;
-        if(editando){const abriu=await abrirQuiz(editando);if(!abriu&&perfilAtual()==='administrador'&&quizEditandoId===editando)document.getElementById('quizFormAviso').textContent='Não foi possível atualizar a visualização. A edição foi preservada; consulte o quiz antes de reenviar.';}else{for(const id of ['quizTitulo','quizDescricao'])document.getElementById(id).value='';document.getElementById('quizPerguntas').replaceChildren();document.getElementById('quizRevisao').replaceChildren();await showQuizzes();}
+        if(editando){const abriu=await abrirQuiz(editando);if(!abriu&&perfilAtual()==='administrador'&&quizEditandoId===editando)document.getElementById('quizFormAviso').textContent='Não foi possível atualizar a visualização. A edição foi preservada; consulte o quiz antes de reenviar.';}else{for(const id of ['quizTitulo','quizDescricao'])document.getElementById(id).value='';document.getElementById('quizPerguntas').replaceChildren();document.getElementById('quizRevisao').replaceChildren();if(perfilAtual()==='professor')await abrirQuiz(resultado.id);else await showQuizzes();}
     }catch(erro){if(seq!==quizSequencia||erro.sessaoExpirada)return;document.getElementById('quizFormAviso').textContent=erro.status===409?'Alteração bloqueada por histórico ou dependentes protegidos. A edição foi preservada.':'Não foi possível confirmar a gravação. O rascunho foi preservado.';mostrarErro(erro);}
     finally{quizEnviando=false;campos.forEach(([el,disabled])=>el.disabled=disabled);document.getElementById('quizSalvar').disabled=false;}
 }
@@ -188,6 +188,7 @@ function limparCatalogoQuizzes(){
     for(const id of ['catalogoQuizzesAluno','introducaoQuizAluno'])document.getElementById(id).style.display='none';
 }
 function limparDadosQuizzes(){
+    limparGestaoPinQuiz();
     limparCadastroQuizProfessor();
     document.getElementById('navQuizzesProfessor').classList.remove('open');
     limparCatalogoQuizzes();
@@ -244,7 +245,7 @@ function validarIntroducaoQuiz(q){
 }
 async function showCatalogoQuizzes(){
     if(perfilAtual()!=='aluno')return;
-    hideAll();closeSidebar();const seq=catalogoQuizSequencia,lista=document.getElementById('catalogoQuizLista'),aviso=document.getElementById('catalogoQuizAviso');
+    hideAll();closeSidebar();prepararQuizPinAluno();const seq=catalogoQuizSequencia,lista=document.getElementById('catalogoQuizLista'),aviso=document.getElementById('catalogoQuizAviso');
     document.getElementById('catalogoQuizzesAluno').style.display='block';document.getElementById('breadcrumbCurrent').textContent='Quizzes disponíveis';lista.replaceChildren();aviso.textContent='Carregando...';
     try{const dados=(await apiFetch(API+'/aluno/quizzes')).dados;if(!Array.isArray(dados))formatoInvalido();dados.forEach(validarIntroducaoQuiz);if(seq!==catalogoQuizSequencia)return;
         aviso.textContent=dados.length?'':'Nenhum quiz disponível para seus projetos.';

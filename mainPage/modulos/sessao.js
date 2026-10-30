@@ -4,6 +4,7 @@ function perfilAtual() { return sessaoAtual?.perfil || ''; }
 function getPessoaAtualId() { return sessaoAtual?.pessoa_id || ''; }
 
 function limparEstadoSessao() {
+    limparQuizPinAluno();
     limparMensagens();
     limparDadosQuizzes();
     detalheProjetoSequencia++;

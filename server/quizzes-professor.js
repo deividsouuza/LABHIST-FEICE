@@ -4,6 +4,7 @@ import {autorizarProjeto} from './acesso-academico.js';
 import {confirmarSessao} from './identidades.js';
 import {executarTransacao} from './banco/transacao.js';
 import {validarQuizPayload,inserirPergunta,carregarQuiz} from './quizzes.js';
+import {gerarPinQuiz,lerPinQuiz} from './quiz-pin.js';
 
 function requireProfessor(req,res,next){if(req.session.identidade?.perfil!=='professor')return res.status(403).json({erro:'Acesso restrito a professores.'});next();}
 function validarCadastro(req,res,next){
@@ -24,14 +25,14 @@ export function registrarQuizzesProfessor(app,{obterPool,requireAuth,requireIden
     const acesso=[requireAuth,requireProfessor,requireIdentidadeAtual];
     app.post('/professor/quizzes',...acesso,validarCadastro,async(req,res)=>{
         try{
-            const id=await executarTransacao(obterPool(),async banco=>{
+            const dados=await executarTransacao(obterPool(),async banco=>{
                 const i=await confirmarSessao(banco,req.session.identidade,true),v=req.quizVinculo,p=req.quizPayload;
                 await autorizarProjeto(banco,v.projeto,i,true);
                 if(v.sub!==null){const [rows]=await banco.query('SELECT id,projeto_id FROM subprojeto WHERE id=? FOR SHARE',[v.sub]);if(!rows.length||rows[0].projeto_id!==v.projeto)throw new ErroHttp(400,'Subprojeto não pertence ao projeto selecionado.');}
                 const [r]=await banco.query("INSERT INTO quiz (titulo,descricao,projeto_id,subprojeto_id,estado,introducao_publica,autor_conta_id,autor_professor_id) VALUES (?,?,?,?,'rascunho',0,?,?)",[p.titulo,p.descricao,v.projeto,v.sub,i.conta_id,i.pessoa_id]);
                 for(const [ordem,pergunta] of p.perguntas.entries())await inserirPergunta(banco,r.insertId,pergunta,ordem);
-                return r.insertId;
-            });res.status(201).json({id,mensagem:'Quiz cadastrado como rascunho. A publicação é feita pelo administrador.'});
+                return {id:r.insertId,pin:await gerarPinQuiz(banco,r.insertId)};
+            });res.status(201).json({...dados,mensagem:'Quiz cadastrado. Compartilhe o PIN para receber respostas de alunos e visitantes.'});
         }catch(erro){responderErro(res,erro);}
     });
     app.get('/professor/quizzes',...acesso,async(req,res)=>{
@@ -45,7 +46,7 @@ export function registrarQuizzesProfessor(app,{obterPool,requireAuth,requireIden
         try{
             const dados=await executarTransacao(obterPool(),async banco=>{
                 const i=await confirmarSessao(banco,req.session.identidade,true),q=await exigirQuizProprio(banco,req.recursoId,i);
-                return {...await carregarQuiz(banco,q.id),projeto_id:q.projeto_id,subprojeto_id:q.subprojeto_id,estado:q.estado};
+                return {...await carregarQuiz(banco,q.id),projeto_id:q.projeto_id,subprojeto_id:q.subprojeto_id,estado:q.estado,pin:await lerPinQuiz(banco,q.id)};
             });res.set('Cache-Control','no-store').json(dados);
         }catch(erro){responderErro(res,erro);}
     });

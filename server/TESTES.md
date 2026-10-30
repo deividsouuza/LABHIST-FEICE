@@ -19,6 +19,8 @@ O chat possui `mensagens.test.js` no grupo banco e `mensagens-interface.test.js`
 
 `quizzes-professor-interface.test.js` integra o grupo navegador e usa MySQL/HTTP reais descartáveis, Chrome e a migração018. Contratos e isolamento por autoria/vínculo em [Quizzes pelo professor](QUIZZES-PROFESSOR.md).
 
+O PIN usa `quiz-pin.test.js` (banco) e `quiz-pin-interface.test.js` (navegador), migração019, sem acessar `.env`/banco real. Convite, anonimato, correção e retenção em [PIN do Quiz](QUIZ-PIN.md). Resets dos testes removem as tabelas filhas antes de quizzes/perguntas, preservando FKs ativas.
+
 - test:seguranca: HTTP Express real com sessões fictícias e doubles SQL, validações, configuração, conteúdo de uploads e arquivos temporários. Não requer serviço MySQL nem navegador.
 - test:banco: executável local do MySQL Server; cria instâncias próprias em diretórios temporários, banco fixture_p01, portas efêmeras, sem my.ini (--no-defaults), sem serviço/dados/credenciais da aplicação. Inclui testes mistos com doubles. Não conecta ao banco de desenvolvimento.
 - test:navegador: Chrome/Edge e MySQL locais; perfil temporário próprio, sem perfil/clipboard pessoal. Os testes anteriores usam API/DB controlados. P41 acrescenta nove casos com navegador/HTTP/MySQL reais e SMTP fictício, incluindo o fluxo completo de recuperação e login; essa integração local comprova esse percurso, sem SMTP de produção. A suíte quizzes-academico-interface acrescenta Chrome/HTTP/MySQL reais para configuração, catálogo e respostas/resultados; simula apenas as falhas de rede especificadas.

@@ -5,8 +5,8 @@ import {fileURLToPath} from 'node:url';
 import {mysqld} from '../test/helpers/mysql-temporario.js';
 import {chromePath} from '../test/helpers/navegador.js';
 const raiz=fileURLToPath(new URL('../',import.meta.url));
-const bancos=new Set(['acesso-academico','download-documentos','identidades','esquema','integridade-projetos','transacoes','migracao-credenciais','respostas-api','limpeza-arquivos','subprojetos','listagem-projetos','status-projetos','quizzes','publico','operacao','recuperacao','disponibilidade-quizzes','catalogo-quizzes','resultados-quizzes','historico-quizzes','mensagens']);
-const navegadores=new Set(['formulario-pessoas','respostas-api-navegador','sessao-interface','erros-interface','projetos-interface','quizzes-interface','publico-interface','operacao-interface','recuperacao-interface','quizzes-academico-interface','homologacao-interface','nucleos-interface','criacao-professor-interface','mensagens-interface','quizzes-professor-interface']);
+const bancos=new Set(['acesso-academico','download-documentos','identidades','esquema','integridade-projetos','transacoes','migracao-credenciais','respostas-api','limpeza-arquivos','subprojetos','listagem-projetos','status-projetos','quizzes','publico','operacao','recuperacao','disponibilidade-quizzes','catalogo-quizzes','resultados-quizzes','historico-quizzes','mensagens','quiz-pin']);
+const navegadores=new Set(['formulario-pessoas','respostas-api-navegador','sessao-interface','erros-interface','projetos-interface','quizzes-interface','publico-interface','operacao-interface','recuperacao-interface','quizzes-academico-interface','homologacao-interface','nucleos-interface','criacao-professor-interface','mensagens-interface','quizzes-professor-interface','quiz-pin-interface']);
 export function validarAmbienteTestes(env,args=[]){
     const proibidas=Object.keys(env).filter(k=>/^(DB_|MYSQL_(?!D_BIN$)|DATABASE_URL$|SMTP_|RECOVERY_|LABHIST_TEST_DB|SESSION_SECRET$|NODE_OPTIONS$)/i.test(k)&&env[k]);
     if(proibidas.length)throw new Error('Ambiente de aplicação recusado para testes: '+proibidas.join(', ')+'. Use um terminal sem configurações de banco/segredo da aplicação.');

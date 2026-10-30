@@ -2,6 +2,7 @@ import { quizFkAplicada, verificarDisponibilidade } from './quizzes-esquema.js';
 import alunosSubprojetos from './versoes/016-alunos-subprojetos.js';
 import {verificarMensagens} from './mensagens-esquema.js';
 import quizzesProfessor from './versoes/018-quizzes-professor.js';
+import {verificarPin} from './pin-esquema.js';
 import { tabelas, adicoesLegadas } from './esquema.js';
 import { migracoes, versaoEsperada } from './migracoes.js';
 import { prepararIntegridade, restricaoAplicada, verificarIntegridade, ErroIntegridade } from './integridade-projetos.js';
@@ -81,6 +82,7 @@ export async function verificarEsquema(banco) {
     await verificarAlunosSubprojetos(banco);
     await verificarMensagens(banco);
     await verificarAutoriaQuiz(banco);
+    await verificarPin(banco);
     return { versao: versaoEsperada };
 }
 
@@ -127,6 +129,7 @@ export async function executarMigracoes(banco, ate = versaoEsperada) {
             if (migracao.versao === 16) await verificarAlunosSubprojetos(banco);
             if (migracao.versao === 17) await verificarMensagens(banco);
             if (migracao.versao === 18) await verificarAutoriaQuiz(banco);
+            if (migracao.versao === 19) await verificarPin(banco);
             await banco.query('INSERT INTO schema_migrations (versao, nome, checksum) VALUES (?, ?, ?)', [migracao.versao, migracao.nome, migracao.checksum]);
             aplicadas.push(migracao.versao);
         }

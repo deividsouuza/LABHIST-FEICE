@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="menu.css">
     <link rel="stylesheet" href="mensagens.css">
+    <link rel="stylesheet" href="../assets/quiz-pin.css">
 </head>
 <body data-sessao="pendente">
     <div id="sessaoStatus" role="status"><span>Verificando acesso...</span> <button type="button" onclick="inicializarSessao()">Tentar novamente</button></div>
@@ -218,7 +219,7 @@
 
             <div class="form-panel" id="catalogoQuizzesAluno" style="display:none;">
                 <div class="panel-accent-bar purple"></div><div class="panel-head"><h2>Quizzes disponíveis</h2></div>
-                <div class="panel-body"><p id="catalogoQuizAviso" role="status" aria-live="polite"></p><div id="catalogoQuizLista"></div></div>
+                <div class="panel-body"><div id="quizPinAluno"></div><p id="catalogoQuizAviso" role="status" aria-live="polite"></p><div id="catalogoQuizLista"></div></div>
                 <div class="panel-foot"><button type="button" class="btn-ghost" onclick="showCatalogoQuizzes()">Atualizar catálogo</button></div>
             </div>
             <div class="form-panel" id="introducaoQuizAluno" style="display:none;">
@@ -248,7 +249,7 @@
                         <legend>Projeto do quiz</legend>
                         <div class="form-section"><label class="form-label" for="quizCadastroProjeto">Projeto</label><select class="form-input purple" id="quizCadastroProjeto" onchange="carregarSubprojetosCadastroQuiz()"></select></div>
                         <div class="form-section"><label class="form-label" for="quizCadastroSubprojeto">Subprojeto (opcional)</label><select class="form-input purple" id="quizCadastroSubprojeto"></select></div>
-                        <p>O quiz será salvo como rascunho. A publicação é feita pelo administrador.</p><p id="quizCadastroAviso" role="status"></p>
+                        <p>Ao salvar, será gerado um PIN para alunos e visitantes responderem. A publicação no catálogo continua com o administrador.</p><p id="quizCadastroAviso" role="status"></p>
                     </fieldset>
                     <div class="form-section"><label class="form-label" for="quizTitulo">Título</label><input class="form-input purple" id="quizTitulo" type="text" required maxlength="255"><small id="quizTituloErro" class="quiz-erro"></small></div>
                     <div class="form-section"><label class="form-label" for="quizDescricao">Descrição</label><textarea class="form-input purple" id="quizDescricao" rows="3"></textarea><small id="quizDescricaoErro" class="quiz-erro"></small></div>
@@ -273,6 +274,7 @@
             </form>
             <div class="form-panel" id="detalheQuiz" style="display:none;">
                 <div class="panel-accent-bar purple"></div><div class="panel-head"><h2 id="quizDetalheTitulo"></h2></div>
+                <div class="panel-body"><section id="quizPinGestao" class="quiz-pin-gestao" hidden><h3>PIN do Quiz</h3><p>Compartilhe este código com alunos e visitantes para responderem.</p><label class="form-label" for="quizPinCodigo">Código de acesso</label><input id="quizPinCodigo" readonly aria-label="PIN do Quiz"><p id="quizPinStatus" role="status"></p><a id="quizPinLink" target="_blank" rel="noopener">Abrir página de participação</a><div class="panel-foot"><button class="btn-ghost" type="button" onclick="copiarPinQuiz()">Copiar PIN</button><button id="quizPinGerar" class="btn-ghost" type="button" onclick="alterarPinQuiz('gerar')">Renovar PIN</button><button id="quizPinDesativar" class="btn-ghost" type="button" onclick="alterarPinQuiz('desativar')">Encerrar PIN</button></div></section></div>
                 <div class="panel-body texto-projeto" id="quizDetalheCorpo"></div><p id="quizDetalheAviso" role="status" aria-live="polite"></p>
                 <div class="panel-foot"><button class="btn-back" onclick="showQuizzes()">← Voltar aos quizzes</button><button class="btn-ghost" id="quizDisponibilidade" onclick="abrirDisponibilidadeQuiz()">Vínculo e publicação</button><button class="btn-submit" id="quizEditar" onclick="editarQuiz()">Editar quiz</button><button class="btn-ghost" id="quizExcluir" onclick="excluirQuiz()">Excluir quiz</button></div>
             </div>
@@ -520,6 +522,7 @@
 </body>
 <script src="../configuracao-publica.js"></script>
 <script src="../assets/api.js"></script>
+<script src="../assets/quiz-pin.js"></script>
 <script src="modulos/api.js"></script>
 <script src="modulos/comum.js"></script>
 <script src="modulos/pessoas.js"></script>
@@ -529,6 +532,7 @@
 <script src="modulos/subprojetos.js"></script>
 <script src="modulos/documentos.js"></script>
 <script src="modulos/quizzes.js"></script>
+<script src="modulos/quiz-pin.js"></script>
 <script src="modulos/desempenho.js"></script>
 <script src="modulos/mensagens.js"></script>
 <script src="cadastro.js"></script>
